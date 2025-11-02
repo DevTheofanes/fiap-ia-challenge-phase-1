@@ -8,5 +8,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV MPLBACKEND=Agg
 
 COPY . .
-# Exemplo: rodar um script que treina e salva resultados
-CMD ["python", "src/models.py"]
+# Executa o pipeline principal
+CMD ["python", "src/main.py"]

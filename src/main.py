@@ -2,8 +2,11 @@
 # === Configurações iniciais ===
 from __future__ import annotations
 
-# Caminho para o CSV
-DATA_PATH = '../data/wisconsin_breast_cancer.csv'
+# Caminho para o CSV (calculado dinamicamente a partir da raiz do projeto)
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_PATH = BASE_DIR / 'data' / 'wisconsin_breast_cancer.csv'
 
 # Coluna alvo esperada no dataset (diagnóstico: 'M' ou 'B')
 TARGET_COL = 'diagnosis'
@@ -16,12 +19,18 @@ RANDOM_STATE = 42
 
 
 # === Imports ===
-import os, io, warnings, joblib
+import io, warnings, joblib
 warnings.filterwarnings("ignore")
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+try:  # Compatibilidade com execução fora de notebooks
+    from IPython.display import display  # type: ignore
+except Exception:  # pragma: no cover - fallback simples
+    def display(obj):  # type: ignore
+        print(obj if isinstance(obj, str) else str(obj))
 
 from typing import Dict, List, Tuple
 
@@ -56,7 +65,7 @@ except Exception:
 
 
 # === Leitura ===
-assert os.path.exists(DATA_PATH), f"Arquivo CSV não encontrado: {DATA_PATH}"
+assert DATA_PATH.exists(), f"Arquivo CSV não encontrado: {DATA_PATH}"
 df = pd.read_csv(DATA_PATH)
 print("Formato:", df.shape)
 display(df.head())

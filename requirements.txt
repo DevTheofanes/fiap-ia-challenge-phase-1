@@ -6,3 +6,4 @@ seaborn
 ipywidgets
 jupyter
 imbalanced-learn
+joblib
