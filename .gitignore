@@ -1,0 +1,19 @@
+# Local organization
+bin/*
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytype/
+.mypy_cache/
+ruff_cache/
+.dmypy.json
+
+# Virtual envs
+env/*
+
+# MacOS
+.DS_Store
