@@ -33,6 +33,7 @@ execução em ambientes headless (como containers Docker) sem dependências grá
 ├── notebooks/                     # Explorações e estudos em Jupyter
 ├── src/
 │   └── main.py                    # Pipeline completo de treinamento
+│   └── genetic/                   # Espaço de busca e codificação genética
 ├── requirements.txt               # Dependências Python
 ├── Dockerfile                     # Imagem para execução containerizada
 └── README.md
@@ -104,6 +105,18 @@ interativo; para salvá-los, configure `matplotlib` conforme necessário no pró
 
 Detalhes completos sobre escolhas de modelagem e resultados podem ser encontrados em
 [`Relatorio_Tecnico_Tech_Challenge_Fase1.md`](Relatorio_Tecnico_Tech_Challenge_Fase1.md).
+
+## Genome design & constraints
+
+- Modelos alvo: `LR` (Logistic Regression) e `RF` (Random Forest), otimizados separadamente.
+- Métrica fitness: `f1` (definida em `src/config.py`); avaliação recomendada com
+  `StratifiedKFold` de 3 folds no conjunto de treino.
+- Espaço de busca: definido em `src/genetic/search_space.py`.
+- Codificação: funções `random_individual`, `mutate`, `crossover`, `decode`, `repair` em
+  `src/genetic/encoding.py` (genes contínuos, discretos e categóricos).
+- Restrições tratadas no `repair()`:
+  - `penalty`/`solver` válidos em Logistic Regression.
+  - `min_samples_split > min_samples_leaf` e `criterion` suportado em Random Forest.
 
 ## Contato
 
