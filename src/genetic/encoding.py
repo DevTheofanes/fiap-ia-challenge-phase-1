@@ -77,14 +77,7 @@ def decode(
     random_state = getattr(config, "RANDOM_STATE", 42)
 
     if model_name == "LR":
-        max_iter = int(params.pop("max_iter"))
-        class_weight = params.pop("class_weight")
-        estimator = LogisticRegression(
-            max_iter=max_iter,
-            class_weight=class_weight,
-            random_state=random_state,
-            **params,
-        )
+        estimator = _build_lr_estimator(params, random_state)
     elif model_name == "RF":
         estimator = RandomForestClassifier(
             class_weight="balanced",
@@ -209,3 +202,48 @@ def _is_valid_rf_criterion(value: str) -> bool:
         return True
     except Exception:
         return False
+
+
+def _build_lr_estimator(params: Dict[str, Any], random_state: int) -> LogisticRegression:
+    params = dict(params)
+    max_iter = int(params.pop("max_iter"))
+    class_weight = params.pop("class_weight")
+    penalty = params.pop("penalty", "l2")
+
+    if _penalty_deprecated():
+        l1_ratio = None
+        if penalty == "l2":
+            l1_ratio = 0.0
+        elif penalty == "l1":
+            l1_ratio = 1.0
+
+        if l1_ratio is not None:
+            params["l1_ratio"] = l1_ratio
+
+        return LogisticRegression(
+            max_iter=max_iter,
+            class_weight=class_weight,
+            random_state=random_state,
+            **params,
+        )
+
+    params["penalty"] = penalty
+    return LogisticRegression(
+        max_iter=max_iter,
+        class_weight=class_weight,
+        random_state=random_state,
+        **params,
+    )
+
+
+def _penalty_deprecated() -> bool:
+    try:
+        import sklearn
+    except Exception:
+        return False
+
+    version = getattr(sklearn, "__version__", "0.0")
+    parts = version.split(".")
+    major = int(parts[0]) if parts and parts[0].isdigit() else 0
+    minor = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
+    return (major, minor) >= (1, 8)

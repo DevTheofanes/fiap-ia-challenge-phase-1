@@ -1,0 +1,26 @@
+{
+  "genes": {
+    "C": 0.9904660657749933,
+    "penalty": "l1",
+    "solver": "saga",
+    "max_iter": 1648,
+    "class_weight": "balanced"
+  },
+  "fitness": 0.9801998692444195,
+  "params_resolved": {
+    "C": 0.9904660657749933,
+    "class_weight": "balanced",
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 1.0,
+    "max_iter": 1648,
+    "n_jobs": null,
+    "penalty": "deprecated",
+    "random_state": 42,
+    "solver": "saga",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  }
+}

@@ -11,7 +11,7 @@ LR_SPACE: ModelSpace = {
     "C": {"type": "float", "min": 1e-4, "max": 1e2, "scale": "log"},
     "penalty": {"type": "categorical", "values": ["l1", "l2"]},
     "solver": {"type": "categorical", "values": ["lbfgs", "liblinear", "saga"]},
-    "max_iter": {"type": "int", "min": 200, "max": 2000},
+    "max_iter": {"type": "int", "min": 500, "max": 5000},
     "class_weight": {"type": "categorical", "values": [None, "balanced"]},
 }
 
