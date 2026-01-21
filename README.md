@@ -118,6 +118,74 @@ Detalhes completos sobre escolhas de modelagem e resultados podem ser encontrado
   - `penalty`/`solver` válidos em Logistic Regression.
   - `min_samples_split > min_samples_leaf` e `criterion` suportado em Random Forest.
 
+## Integração com LLM para interpretação
+
+Adiciona uma camada de LLM ao pipeline para explicar diagnósticos e resumir resultados
+de experimentos em linguagem natural, com saída estruturada em JSON e fallback templateado.
+
+### Principais recursos
+
+- **Contrato de entrada/saída** para explicações clínicas e resumos de métricas.
+- **Prompts versionados** em `src/llm/prompts.py`.
+- **Validação do JSON** (schemas) em `src/llm/schemas.py`.
+- **Logging** de prompts e respostas em `artifacts/llm/llm_logs.jsonl` (com redaction).
+- **Fallback** quando a LLM não estiver configurada.
+
+### Estrutura adicionada
+
+```
+src/llm/
+  client.py          # Cliente Gemini (ou mock) e carregamento de .env
+  prompts.py         # Templates dos prompts
+  schemas.py         # Parsers e validação de JSON
+  explain.py         # Geração de explicação por amostra
+  summarize.py       # Resumo de métricas/experimentos
+scripts/
+  explain_sample.py  # Roda explicação em 1 amostra
+  summarize_results.py # Resume baseline vs GA
+artifacts/llm/
+  sample_explanations.jsonl
+  experiment_summaries.md
+reports/
+  llm_eval.md        # Rubrica de avaliação manual
+```
+
+### Configuração do Gemini
+
+1. Copie/ajuste o arquivo `.env` com sua chave:
+
+   ```bash
+   GEMINI_API_KEY=...
+   GEMINI_MODEL=gemini-1.5-flash
+   ```
+
+2. Instale a dependência:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+Se a chave não estiver definida, o pipeline gera respostas templateadas automaticamente.
+
+### Exemplos de uso
+
+- Explicar uma amostra (salva JSONL e log):
+
+  ```bash
+  python scripts/explain_sample.py --split val --sample-idx 0
+  ```
+
+- Resumir baseline vs GA (gera `artifacts/llm/experiment_summaries.md`):
+
+  ```bash
+  python scripts/summarize_results.py
+  ```
+
+### Avaliação de qualidade (rubrica)
+
+Preencha a tabela em `reports/llm_eval.md` com 10 amostras, avaliando clareza, coerência,
+não-alarmismo, utilidade clínica e conformidade.
+
 ## Contato
 
 Dúvidas ou sugestões podem ser direcionadas via issues neste repositório.
