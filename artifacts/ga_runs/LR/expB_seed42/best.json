@@ -1,0 +1,61 @@
+{
+  "best_genome": {
+    "C": 0.9280682415844124,
+    "penalty": "l1",
+    "solver": "saga",
+    "max_iter": 2506,
+    "class_weight": "balanced"
+  },
+  "decoded_params": {
+    "C": 0.9280682415844124,
+    "class_weight": "balanced",
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 1.0,
+    "max_iter": 2506,
+    "n_jobs": null,
+    "penalty": "deprecated",
+    "random_state": 42,
+    "solver": "saga",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "best_cv_f1": 0.9801998692444195,
+  "timestamp": "2026-01-20 20:16:57",
+  "training_time_sec": 170.18130207061768,
+  "holdout": "val",
+  "holdout_metrics": {
+    "accuracy": 0.9912280701754386,
+    "precision": 1.0,
+    "recall": 0.9767441860465116,
+    "f1": 0.9882352941176471,
+    "roc_auc": 1.0,
+    "confusion_matrix": [
+      [
+        71,
+        0
+      ],
+      [
+        1,
+        42
+      ]
+    ]
+  },
+  "config": {
+    "exp_id": "B",
+    "model": "LR",
+    "seed": 42,
+    "ga_config": {
+      "pop_size": 60,
+      "n_generations": 25,
+      "mutation_rate": 0.2,
+      "crossover_rate": 0.7,
+      "tournament_k": 2,
+      "elite_pct": 0.03333333333333333,
+      "seed": 42
+    },
+    "elite_n": 2
+  }
+}

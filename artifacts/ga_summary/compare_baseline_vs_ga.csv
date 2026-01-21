@@ -1,0 +1,5 @@
+model,approach,f1_cv,f1_holdout,recall_holdout,notes,source_run
+LR,Baseline,,0.9761904761904762,0.9534883720930233,baseline_val,
+LR,GA,0.9801998692444195,0.9882352941176471,0.9767441860465116,expA_seed42,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/LR/expA_seed42
+RF,Baseline,,0.9523809523809523,0.9302325581395349,baseline_val,
+RF,GA,0.9453672942045035,0.9523809523809523,0.9302325581395349,expB_seed43,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expB_seed43

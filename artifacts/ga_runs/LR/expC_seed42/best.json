@@ -1,0 +1,61 @@
+{
+  "best_genome": {
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "C": 0.2052313905088612,
+    "max_iter": 3462,
+    "class_weight": null
+  },
+  "decoded_params": {
+    "C": 0.2052313905088612,
+    "class_weight": null,
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 0.0,
+    "max_iter": 3462,
+    "n_jobs": null,
+    "penalty": "deprecated",
+    "random_state": 42,
+    "solver": "lbfgs",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "best_cv_f1": 0.9799023830031581,
+  "timestamp": "2026-01-20 20:20:09",
+  "training_time_sec": 19.627739191055298,
+  "holdout": "val",
+  "holdout_metrics": {
+    "accuracy": 0.9736842105263158,
+    "precision": 1.0,
+    "recall": 0.9302325581395349,
+    "f1": 0.963855421686747,
+    "roc_auc": 1.0,
+    "confusion_matrix": [
+      [
+        71,
+        0
+      ],
+      [
+        3,
+        40
+      ]
+    ]
+  },
+  "config": {
+    "exp_id": "C",
+    "model": "LR",
+    "seed": 42,
+    "ga_config": {
+      "pop_size": 30,
+      "n_generations": 50,
+      "mutation_rate": 0.05,
+      "crossover_rate": 0.9,
+      "tournament_k": 4,
+      "elite_pct": 0.06666666666666667,
+      "seed": 42
+    },
+    "elite_n": 2
+  }
+}

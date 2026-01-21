@@ -1,0 +1,10 @@
+model,exp_id,seed,best_cv_f1,best_holdout_f1,holdout_recall,holdout_split,training_time_sec,run_dir
+RF,C,42,0.9449112978524742,0.9397590361445783,0.9069767441860465,val,1295.6943287849426,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expC_seed42
+RF,C,44,0.9406526902347675,0.9523809523809523,0.9302325581395349,val,369.9603931903839,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expC_seed44
+RF,C,43,0.9418922875217982,0.9523809523809523,0.9302325581395349,val,117.52915096282959,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expC_seed43
+RF,A,43,0.9484538374983877,0.9512195121951219,0.9069767441860465,val,163.77077794075012,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expA_seed43
+RF,A,44,0.9406526902347675,0.9523809523809523,0.9302325581395349,val,488.2721598148346,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expA_seed44
+RF,A,42,0.9411764705882352,0.9523809523809523,0.9302325581395349,val,523.0731451511383,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expA_seed42
+RF,B,43,0.9453672942045035,0.9523809523809523,0.9302325581395349,val,790.3735952377319,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expB_seed43
+RF,B,44,0.9406526902347675,0.9523809523809523,0.9302325581395349,val,3034.770206928253,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expB_seed44
+RF,B,42,0.9449112978524742,0.9397590361445783,0.9069767441860465,val,888.096097946167,/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/ga_runs/RF/expB_seed42

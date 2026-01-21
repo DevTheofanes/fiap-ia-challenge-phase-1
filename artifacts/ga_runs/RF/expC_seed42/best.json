@@ -1,0 +1,67 @@
+{
+  "best_genome": {
+    "n_estimators": 403,
+    "max_depth": 12,
+    "min_samples_split": 6,
+    "min_samples_leaf": 2,
+    "criterion": "entropy",
+    "ccp_alpha": 0.004190140615429754
+  },
+  "decoded_params": {
+    "bootstrap": true,
+    "ccp_alpha": 0.004190140615429754,
+    "class_weight": "balanced",
+    "criterion": "entropy",
+    "max_depth": 12,
+    "max_features": "sqrt",
+    "max_leaf_nodes": null,
+    "max_samples": null,
+    "min_impurity_decrease": 0.0,
+    "min_samples_leaf": 2,
+    "min_samples_split": 6,
+    "min_weight_fraction_leaf": 0.0,
+    "monotonic_cst": null,
+    "n_estimators": 403,
+    "n_jobs": null,
+    "oob_score": false,
+    "random_state": 42,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "best_cv_f1": 0.9449112978524742,
+  "timestamp": "2026-01-20 22:26:26",
+  "training_time_sec": 1295.6943287849426,
+  "holdout": "val",
+  "holdout_metrics": {
+    "accuracy": 0.956140350877193,
+    "precision": 0.975,
+    "recall": 0.9069767441860465,
+    "f1": 0.9397590361445783,
+    "roc_auc": 0.9977071732721913,
+    "confusion_matrix": [
+      [
+        70,
+        1
+      ],
+      [
+        4,
+        39
+      ]
+    ]
+  },
+  "config": {
+    "exp_id": "C",
+    "model": "RF",
+    "seed": 42,
+    "ga_config": {
+      "pop_size": 30,
+      "n_generations": 50,
+      "mutation_rate": 0.05,
+      "crossover_rate": 0.9,
+      "tournament_k": 4,
+      "elite_pct": 0.06666666666666667,
+      "seed": 42
+    },
+    "elite_n": 2
+  }
+}
