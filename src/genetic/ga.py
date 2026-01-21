@@ -45,7 +45,7 @@ def run_ga(
 
     for generation in range(config.n_generations):
         gen_start = time.time()
-        _evaluate_population(population, fitness_fn)
+        eval_count, eval_time_sec = _evaluate_population(population, fitness_fn)
 
         population.sort(key=lambda ind: ind.fitness or -math.inf, reverse=True)
         best = population[0]
@@ -64,6 +64,8 @@ def run_ga(
                 "best_genes": json.dumps(best.genes, sort_keys=True, default=str),
                 "best_params": json.dumps(best.params_resolved or {}, sort_keys=True, default=str),
                 "elapsed_sec": time.time() - gen_start,
+                "eval_count": eval_count,
+                "eval_time_sec": eval_time_sec,
             }
         )
 
@@ -93,13 +95,19 @@ def _init_population(model_name: str, pop_size: int, rng: random.Random) -> List
     return [Individual(random_individual(model_name, rng)) for _ in range(pop_size)]
 
 
-def _evaluate_population(population: List[Individual], fitness_fn: FitnessFn) -> None:
+def _evaluate_population(population: List[Individual], fitness_fn: FitnessFn) -> Tuple[int, float]:
+    eval_count = 0
+    eval_time_sec = 0.0
     for individual in population:
         if individual.fitness is not None:
             continue
+        start = time.time()
         fitness, params_resolved = fitness_fn(individual.genes)
+        eval_time_sec += time.time() - start
+        eval_count += 1
         individual.fitness = fitness
         individual.params_resolved = params_resolved
+    return eval_count, eval_time_sec
 
 
 def _tournament_select(population: List[Individual], k: int, rng: random.Random) -> Individual:

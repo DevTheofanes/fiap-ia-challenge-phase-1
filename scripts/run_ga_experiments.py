@@ -23,6 +23,7 @@ from src.data.split import apply_splits, make_or_load_splits
 from src.genetic.encoding import decode
 from src.genetic.fitness import evaluate_fitness
 from src.genetic.ga import GAConfig, run_ga
+from src.logging_utils import log_event, setup_json_logger
 from src.models.train import evaluate_on_test
 
 
@@ -98,6 +99,8 @@ def main() -> None:
     args = _parse_args()
     ga_config, elite_n = _make_ga_config(args.exp, args.seed)
     _set_seeds(ga_config.seed)
+    train_logger = setup_json_logger("ga.train", config.TRAINING_LOG_PATH)
+    eval_logger = setup_json_logger("ga.eval", config.EVALUATION_LOG_PATH)
 
     X, y = load_dataset(config.DATA_PATH, config.TARGET_COL, config.ID_COLS)
     splits = make_or_load_splits(
@@ -156,6 +159,8 @@ def main() -> None:
                 "generation": row["generation"],
                 "best_f1": row["best_fitness"],
                 "mean_f1": row["mean_fitness"],
+                "eval_count": row.get("eval_count"),
+                "eval_time_sec": row.get("eval_time_sec"),
                 "mutation_rate": ga_config.mutation_rate,
                 "crossover_rate": ga_config.crossover_rate,
                 "population_size": ga_config.pop_size,
@@ -184,6 +189,39 @@ def main() -> None:
     (run_dir / "best.json").write_text(json.dumps(best_payload, indent=2))
 
     joblib.dump(pipeline, run_dir / "best_model.joblib")
+
+    total_eval_count = sum(row.get("eval_count", 0) for row in history)
+    total_eval_time = sum(row.get("eval_time_sec", 0.0) for row in history)
+    mean_gen_time = float(np.mean([row.get("elapsed_sec", 0.0) for row in history])) if history else 0.0
+    mean_eval_time = (total_eval_time / total_eval_count) if total_eval_count else 0.0
+    experiment_id = f"exp{args.exp}"
+    log_event(
+        train_logger,
+        "ga_train",
+        model=args.model,
+        experiment=experiment_id,
+        seed=ga_config.seed,
+        ga_config=ga_config.__dict__,
+        best_f1=best_individual.fitness,
+        duration_sec=training_time_sec,
+        mean_gen_time_sec=mean_gen_time,
+        eval_count=total_eval_count,
+        mean_eval_time_sec=mean_eval_time,
+    )
+    log_event(
+        eval_logger,
+        "ga_eval",
+        model=args.model,
+        experiment=experiment_id,
+        seed=ga_config.seed,
+        split=holdout_split,
+        f1=holdout_metrics.get("f1"),
+        recall=holdout_metrics.get("recall"),
+        precision=holdout_metrics.get("precision"),
+        accuracy=holdout_metrics.get("accuracy"),
+        roc_auc=holdout_metrics.get("roc_auc"),
+        pr_auc=holdout_metrics.get("pr_auc"),
+    )
 
     print(f"GA experiment saved to {run_dir}")
 

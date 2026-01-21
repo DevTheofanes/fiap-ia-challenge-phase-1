@@ -186,6 +186,55 @@ Se a chave não estiver definida, o pipeline gera respostas templateadas automat
 Preencha a tabela em `reports/llm_eval.md` com 10 amostras, avaliando clareza, coerência,
 não-alarmismo, utilidade clínica e conformidade.
 
+## Monitoramento, Logging e Escalabilidade
+
+### Logging estruturado
+Os logs ficam em `artifacts/logs/` no formato JSONL, com uma linha por evento. Campos
+chave incluem timestamp, stage, model, experiment, seed, metricas finais e tempo de execucao.
+
+Arquivos gerados:
+- `training.jsonl` (baseline e GA)
+- `evaluation.jsonl` (metricas por split)
+- `llm.jsonl` (eventos de explicabilidade)
+
+Exemplo de linha:
+```
+{"timestamp":"2026-01-20T18:42:10+00:00","level":"INFO","message":"ga_train","stage":"ga_train","model":"RF","experiment":"expB","seed":42,"best_f1":0.94,"duration_sec":312.5}
+```
+
+### Tracking de experimentos (manual)
+Cada experimento gera:
+- `history.csv` com convergencia do GA
+- `best.json` com melhor individuo e metricas
+- `best_model.joblib`
+Os agregados ficam em `artifacts/ga_summary/*.csv` via `scripts/summarize_ga_runs.py`.
+
+### Monitoramento de performance
+Os logs de treinamento registram:
+- tempo total por experimento
+- tempo medio por geracao (`mean_gen_time_sec`)
+- numero de avaliacoes (`eval_count`)
+- tempo medio por avaliacao (`mean_eval_time_sec`)
+Esses dados alimentam a discussao de custo computacional.
+
+### Preparacao para escalabilidade (conceitual)
+- Avaliacao de fitness e independente, podendo ser paralelizada com `multiprocessing` ou `joblib`.
+- Seeds/experimentos rodam como jobs isolados, permitindo escala horizontal.
+- Docker garante reprodutibilidade e isolamento do ambiente.
+
+### Arquitetura (diagrama simples)
+```
+Dataset
+  -> Data Loader
+    -> Preprocessing
+      -> Baseline Models
+      -> GA Optimizer
+        -> Best Model
+          -> Evaluation
+            -> LLM Interpreter
+              -> Artifacts/Logs
+```
+
 ## Contato
 
 Dúvidas ou sugestões podem ser direcionadas via issues neste repositório.

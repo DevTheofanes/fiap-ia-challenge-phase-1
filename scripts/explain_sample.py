@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from dataclasses import asdict
 from pathlib import Path
 
@@ -18,6 +19,7 @@ from src import config
 from src.data.load import load_dataset
 from src.data.split import apply_splits, make_or_load_splits
 from src.llm.explain import build_case_payload, explain_case
+from src.logging_utils import log_event, setup_json_logger
 
 
 def _parse_args() -> argparse.Namespace:
@@ -45,6 +47,16 @@ def _unwrap_estimator(model):
     if hasattr(model, "named_steps"):
         return list(model.named_steps.values())[-1]
     return model
+
+
+def _infer_model_name(model) -> str:
+    estimator = _unwrap_estimator(model)
+    name = estimator.__class__.__name__
+    if name == "LogisticRegression":
+        return "LR"
+    if name == "RandomForestClassifier":
+        return "RF"
+    return name
 
 
 def _compute_importance(model, X_ref, y_ref, feature_names, method: str) -> tuple[np.ndarray, str]:
@@ -92,6 +104,7 @@ def main() -> None:
         raise FileNotFoundError(
             f"Model bundle not found: {bundle_path}. Generate best_model_with_threshold.joblib first."
         )
+    llm_logger = setup_json_logger("llm.explain", config.LLM_STAGE_LOG_PATH)
 
     bundle = joblib.load(bundle_path)
     if isinstance(bundle, dict) and "model" in bundle:
@@ -152,7 +165,9 @@ def main() -> None:
     )
 
     log_path = config.ARTIFACTS_DIR / "llm" / "llm_logs.jsonl"
+    start = time.time()
     explanation = explain_case(payload, log_path=log_path)
+    duration_sec = time.time() - start
 
     output_path = config.ARTIFACTS_DIR / "llm" / "sample_explanations.jsonl"
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -165,6 +180,17 @@ def main() -> None:
     }
     with output_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+    log_event(
+        llm_logger,
+        "llm_explain",
+        model=_infer_model_name(model),
+        experiment="baseline",
+        seed=config.RANDOM_STATE,
+        split=args.split,
+        sample_idx=args.sample_idx,
+        duration_sec=duration_sec,
+    )
 
     print(json.dumps(entry, ensure_ascii=False, indent=2))
 

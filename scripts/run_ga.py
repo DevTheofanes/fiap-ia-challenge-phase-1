@@ -23,6 +23,7 @@ from src.data.split import apply_splits, make_or_load_splits
 from src.genetic.encoding import decode
 from src.genetic.fitness import evaluate_fitness
 from src.genetic.ga import GAConfig, run_ga
+from src.logging_utils import log_event, setup_json_logger
 
 
 DEFAULT_CONFIGS = {
@@ -83,6 +84,7 @@ def main() -> None:
     model_key = args.model
     ga_config = _merge_config(model_key, args)
     _set_seeds(ga_config.seed)
+    train_logger = setup_json_logger("ga.train", config.TRAINING_LOG_PATH)
 
     X, y = load_dataset(config.DATA_PATH, config.TARGET_COL, config.ID_COLS)
     splits = make_or_load_splits(
@@ -110,7 +112,9 @@ def main() -> None:
             n_jobs=None,
         )
 
+    run_start = time.time()
     best_individual, history = run_ga(model_key, fitness_fn, ga_config)
+    run_duration = time.time() - run_start
 
     run_id = time.strftime("run_%Y%m%d_%H%M%S")
     run_dir = config.ARTIFACTS_DIR / "ga_runs" / model_key / run_id
@@ -146,6 +150,24 @@ def main() -> None:
     pipeline = Pipeline([("preprocess", preprocess), ("model", estimator)])
     pipeline.fit(X_full, y_full)
     joblib.dump(pipeline, run_dir / "best_model.joblib")
+
+    total_eval_count = sum(row.get("eval_count", 0) for row in history)
+    total_eval_time = sum(row.get("eval_time_sec", 0.0) for row in history)
+    mean_gen_time = float(np.mean([row.get("elapsed_sec", 0.0) for row in history])) if history else 0.0
+    mean_eval_time = (total_eval_time / total_eval_count) if total_eval_count else 0.0
+    log_event(
+        train_logger,
+        "ga_train",
+        model=model_key,
+        experiment="baseline",
+        seed=ga_config.seed,
+        ga_config=ga_config.__dict__,
+        best_f1=best_individual.fitness,
+        duration_sec=run_duration,
+        mean_gen_time_sec=mean_gen_time,
+        eval_count=total_eval_count,
+        mean_eval_time_sec=mean_eval_time,
+    )
 
     print(f"GA run saved to {run_dir}")
 

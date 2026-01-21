@@ -9,6 +9,10 @@ SPLITS_PATH = BASE_DIR / "data" / "splits.npz"
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 BASELINE_MODELS_DIR = ARTIFACTS_DIR / "baseline_models"
 BASELINE_METRICS_PATH = ARTIFACTS_DIR / "baseline_metrics.json"
+LOGS_DIR = ARTIFACTS_DIR / "logs"
+TRAINING_LOG_PATH = LOGS_DIR / "training.jsonl"
+EVALUATION_LOG_PATH = LOGS_DIR / "evaluation.jsonl"
+LLM_STAGE_LOG_PATH = LOGS_DIR / "llm.jsonl"
 
 TARGET_COL = "diagnosis"
 ID_COLS = ["id", "ID number", "Unnamed: 32"]
