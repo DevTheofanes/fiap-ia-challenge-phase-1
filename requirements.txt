@@ -7,3 +7,4 @@ ipywidgets
 jupyter
 imbalanced-learn
 joblib
+google-generativeai
