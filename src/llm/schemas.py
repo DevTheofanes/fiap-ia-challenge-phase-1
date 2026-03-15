@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -20,6 +21,19 @@ class ExperimentSummary:
     key_improvements: list[str]
     tradeoffs: list[str]
     limitations: list[str]
+
+
+def parse_qa_pairs(text: str) -> list[dict[str, Any]]:
+    """Extract a JSON array of Q&A dicts from an LLM response.
+
+    Handles markdown code fences (```json ... ```) and bare arrays.
+    Raises ValueError if no valid array is found.
+    """
+    cleaned = re.sub(r"```(?:json)?\s*", "", text).strip()
+    match = re.search(r"\[.*\]", cleaned, re.DOTALL)
+    if not match:
+        raise ValueError("No JSON array found in LLM response")
+    return json.loads(match.group(0))
 
 
 def _extract_json(text: str) -> dict[str, Any] | None:

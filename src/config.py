@@ -26,3 +26,8 @@ VAL_SIZE = 0.2
 POSITIVE_LABEL = 1
 
 USE_SCALER = True
+
+FINETUNE_DIR           = BASE_DIR / "data" / "finetune"
+FINETUNE_TRAIN_PATH    = FINETUNE_DIR / "train.jsonl"
+FINETUNE_VAL_PATH      = FINETUNE_DIR / "val.jsonl"
+FINETUNE_PREP_LOG_PATH = LOGS_DIR / "finetune_prep.jsonl"

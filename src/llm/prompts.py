@@ -48,3 +48,29 @@ def format_case_prompt(payload: dict[str, Any]) -> str:
 
 def format_metrics_prompt(table_markdown: str) -> str:
     return METRICS_PROMPT_TEMPLATE.format(table=table_markdown)
+
+
+SYNTHETIC_QA_PROMPT_TEMPLATE = """
+You are a medical education assistant. Generate exactly {n} oncology question-and-answer pairs
+covering topics such as: breast cancer diagnosis, tumor staging, biopsy interpretation,
+cancer biomarkers, treatment modalities, prognosis factors, screening guidelines, and pathology.
+
+Rules:
+- Each pair must be clinically realistic and educationally valuable.
+- Do NOT include any real patient names, dates, hospital names, or identifiable information.
+- Use generic placeholders like "the patient" or "a 55-year-old female".
+- Answers should be factual, evidence-based, and 2-6 sentences long.
+- Respond ONLY with a valid JSON array. No markdown, no preamble, no trailing text.
+
+Format:
+[
+  {{"question": "...", "answer": "..."}},
+  ...
+]
+
+Generate exactly {n} pairs now.
+""".strip()
+
+
+def format_synthetic_qa_prompt(n: int) -> str:
+    return SYNTHETIC_QA_PROMPT_TEMPLATE.format(n=n)
