@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
 import time
 from pathlib import Path
 
@@ -24,6 +23,7 @@ from src.genetic.encoding import decode
 from src.genetic.fitness import evaluate_fitness
 from src.genetic.ga import GAConfig, run_ga
 from src.logging_utils import log_event, setup_json_logger
+from src.utils import set_seeds
 
 
 DEFAULT_CONFIGS = {
@@ -46,11 +46,6 @@ DEFAULT_CONFIGS = {
         seed=config.RANDOM_STATE,
     ),
 }
-
-
-def _set_seeds(seed: int) -> None:
-    random.seed(seed)
-    np.random.seed(seed)
 
 
 def _parse_args() -> argparse.Namespace:
@@ -83,7 +78,7 @@ def main() -> None:
     args = _parse_args()
     model_key = args.model
     ga_config = _merge_config(model_key, args)
-    _set_seeds(ga_config.seed)
+    set_seeds(ga_config.seed)
     train_logger = setup_json_logger("ga.train", config.TRAINING_LOG_PATH)
 
     X, y = load_dataset(config.DATA_PATH, config.TARGET_COL, config.ID_COLS)

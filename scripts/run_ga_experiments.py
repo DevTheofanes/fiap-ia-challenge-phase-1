@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
 import time
 from pathlib import Path
 
@@ -25,6 +24,7 @@ from src.genetic.fitness import evaluate_fitness
 from src.genetic.ga import GAConfig, run_ga
 from src.logging_utils import log_event, setup_json_logger
 from src.models.train import evaluate_on_test
+from src.utils import set_seeds
 
 
 EXPERIMENTS = {
@@ -53,11 +53,6 @@ EXPERIMENTS = {
         "tournament_k": 4,
     },
 }
-
-
-def _set_seeds(seed: int) -> None:
-    random.seed(seed)
-    np.random.seed(seed)
 
 
 def _parse_args() -> argparse.Namespace:
@@ -98,7 +93,7 @@ def _safe_run_dir(root: Path, model_key: str, exp_id: str, seed: int) -> Path:
 def main() -> None:
     args = _parse_args()
     ga_config, elite_n = _make_ga_config(args.exp, args.seed)
-    _set_seeds(ga_config.seed)
+    set_seeds(ga_config.seed)
     train_logger = setup_json_logger("ga.train", config.TRAINING_LOG_PATH)
     eval_logger = setup_json_logger("ga.eval", config.EVALUATION_LOG_PATH)
 

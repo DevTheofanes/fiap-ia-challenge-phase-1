@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import json
-import random
 import time
 from pathlib import Path
 import sys
 
 import joblib
-import numpy as np
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
@@ -19,15 +17,11 @@ from src.evaluation.report import save_baseline_report
 from src.logging_utils import log_event, setup_json_logger
 from src.models.registry import default_model_registry
 from src.models.train import evaluate_on_test, train_and_evaluate
-
-
-def _set_seeds(seed: int) -> None:
-    random.seed(seed)
-    np.random.seed(seed)
+from src.utils import set_seeds
 
 
 def main() -> None:
-    _set_seeds(config.RANDOM_STATE)
+    set_seeds(config.RANDOM_STATE)
     train_logger = setup_json_logger("baseline.train", config.TRAINING_LOG_PATH)
     eval_logger = setup_json_logger("baseline.eval", config.EVALUATION_LOG_PATH)
 
