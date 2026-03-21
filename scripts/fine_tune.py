@@ -72,9 +72,9 @@ def main() -> None:
               lora_alpha=cfg.lora_alpha, epochs=cfg.num_train_epochs,
               batch_size=cfg.per_device_train_batch_size, lr=cfg.learning_rate)
 
-    from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+    from transformers import AutoModelForCausalLM, AutoTokenizer
     from peft import LoraConfig, TaskType, get_peft_model
-    from trl import SFTTrainer
+    from trl import SFTConfig, SFTTrainer
 
     config.FINETUNE_CHECKPOINTS_DIR.mkdir(parents=True, exist_ok=True)
     config.FINETUNE_FINAL_ADAPTER_DIR.mkdir(parents=True, exist_ok=True)
