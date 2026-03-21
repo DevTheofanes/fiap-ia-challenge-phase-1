@@ -31,3 +31,7 @@ FINETUNE_DIR           = BASE_DIR / "data" / "finetune"
 FINETUNE_TRAIN_PATH    = FINETUNE_DIR / "train.jsonl"
 FINETUNE_VAL_PATH      = FINETUNE_DIR / "val.jsonl"
 FINETUNE_PREP_LOG_PATH = LOGS_DIR / "finetune_prep.jsonl"
+
+FINETUNE_CHECKPOINTS_DIR   = ARTIFACTS_DIR / "finetune_checkpoints"
+FINETUNE_FINAL_ADAPTER_DIR = FINETUNE_CHECKPOINTS_DIR / "final_adapter"
+FINETUNE_LOG_PATH          = LOGS_DIR / "finetune.jsonl"
