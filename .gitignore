@@ -18,6 +18,13 @@ env/*
 
 # MacOS
 .DS_Store
+**/.DS_Store
+
+# External datasets (large, not tracked)
+data/external/
+
+# Virtual env
+.venv/
 
 # Generated fine-tune preparation outputs
 artifacts/logs/finetune_prep.jsonl
