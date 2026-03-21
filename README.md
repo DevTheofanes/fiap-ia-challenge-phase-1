@@ -104,7 +104,7 @@ interativo; para salvá-los, configure `matplotlib` conforme necessário no pró
 ## Relatório técnico
 
 Detalhes completos sobre escolhas de modelagem e resultados podem ser encontrados em
-[`Relatorio_Tecnico_Tech_Challenge_Fase1.md`](Relatorio_Tecnico_Tech_Challenge_Fase1.md).
+[`Relatorio_Tecnico_Tech_Challenge_Fase1.md`](docs/reports/Relatorio_Tecnico_Tech_Challenge_Fase1.md).
 
 ## Genome design & constraints
 
@@ -146,7 +146,7 @@ scripts/
 artifacts/llm/
   sample_explanations.jsonl
   experiment_summaries.md
-reports/
+docs/ai/
   llm_eval.md        # Rubrica de avaliação manual
 ```
 
@@ -183,7 +183,7 @@ Se a chave não estiver definida, o pipeline gera respostas templateadas automat
 
 ### Avaliação de qualidade (rubrica)
 
-Preencha a tabela em `reports/llm_eval.md` com 10 amostras, avaliando clareza, coerência,
+Preencha a tabela em `docs/ai/llm_eval.md` com 10 amostras, avaliando clareza, coerência,
 não-alarmismo, utilidade clínica e conformidade.
 
 ## Monitoramento, Logging e Escalabilidade
