@@ -24,7 +24,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--model", choices=["LR", "RF", "all"], default="all")
     parser.add_argument("--runs-root", type=Path, default=config.ARTIFACTS_DIR / "ga_runs")
     parser.add_argument("--summary-root", type=Path, default=config.ARTIFACTS_DIR / "ga_summary")
-    parser.add_argument("--reports-root", type=Path, default=BASE_DIR / "reports")
+    parser.add_argument("--reports-root", type=Path, default=BASE_DIR / "docs" / "reports")
     return parser.parse_args()
 
 
