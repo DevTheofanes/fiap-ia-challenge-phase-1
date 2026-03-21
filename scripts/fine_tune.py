@@ -107,7 +107,7 @@ def main() -> None:
     val_dataset   = _load_dataset(config.FINETUNE_VAL_PATH, cfg)
     log_event(logger, "data_loaded", train_size=len(train_dataset), val_size=len(val_dataset))
 
-    training_args = TrainingArguments(
+    training_args = SFTConfig(
         output_dir=str(config.FINETUNE_CHECKPOINTS_DIR),
         num_train_epochs=cfg.num_train_epochs,
         per_device_train_batch_size=cfg.per_device_train_batch_size,
@@ -124,6 +124,10 @@ def main() -> None:
         logging_steps=10,
         fp16=False,
         bf16=False,   # MPS does not support bf16
+        # SFT-specific params (moved from SFTTrainer in TRL 0.29)
+        dataset_text_field=cfg.text_field,
+        max_length=cfg.max_seq_length,
+        packing=False,
     )
 
     trainer = SFTTrainer(
