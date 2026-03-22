@@ -12,7 +12,6 @@ from __future__ import annotations
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
-from pathlib import Path
 
 from src.assistant.retriever import build_vectorstore
 from src.config import KB_DIR, LOGS_DIR, MEDQUAD_DIR, VECTORSTORE_DIR
@@ -28,7 +27,7 @@ logger = setup_json_logger("build_kb", LOGS_DIR / "build_kb.jsonl")
 
 def _clone_medquad() -> None:
     """Clone MedQuAD repo if not already present."""
-    if _MEDQUAD_ROOT.exists():
+    if (_MEDQUAD_ROOT / ".git").exists():
         print(f"MedQuAD already at {_MEDQUAD_ROOT} — skipping clone.")
         return
     print(f"Cloning MedQuAD to {_MEDQUAD_ROOT} …")
@@ -62,12 +61,15 @@ def _parse_xml_file(xml_path: Path) -> list[dict]:
 
 
 def build_kb() -> int:
-    """Parse MedQuAD cancer Q&A and write to KB_DIR. Returns count of files written."""
+    """Parse MedQuAD cancer Q&A, write to KB_DIR (clears existing .txt files first). Returns count of files written."""
     if not MEDQUAD_DIR.exists():
         print(f"ERROR: MedQuAD source not found at {MEDQUAD_DIR}", file=sys.stderr)
         print("Run with a network connection so the repo can be cloned.", file=sys.stderr)
         sys.exit(1)
 
+    if KB_DIR.exists():
+        for f in KB_DIR.glob("*.txt"):
+            f.unlink()
     KB_DIR.mkdir(parents=True, exist_ok=True)
     xml_files = list(MEDQUAD_DIR.glob("*.xml"))
     print(f"Found {len(xml_files)} XML files in {MEDQUAD_DIR}")
