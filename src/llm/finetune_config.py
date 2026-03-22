@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 
 @dataclass
 class FinetuneConfig:
-    # Model — LLaMA as suggested by challenge spec
-    base_model_name: str = "meta-llama/Llama-3.2-1B"
+    # Model — TinyLlama (LLaMA-based, ungated; same LoRA config as Llama-3.2-1B)
+    base_model_name: str = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
     # LoRA (per M2 spec: r=8, lora_alpha=16)
     # q_proj/v_proj are the standard attention targets for LLaMA architecture
