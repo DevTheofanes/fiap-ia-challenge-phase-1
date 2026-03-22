@@ -23,8 +23,10 @@ huggingface_hub>=0.23.0
 langchain>=0.2.0,<0.4.0
 langchain-community>=0.2.0,<0.4.0
 langchain-google-genai>=1.0.0,<2.0.0
+langchain-huggingface>=0.0.3,<0.2.0
 langgraph>=0.1.0,<0.3.0
 chromadb>=0.5.0,<0.6.0
+sentence-transformers>=2.7.0,<4.0.0
 
 # ── Phase 3: PII Anonymization ──────────────────────────────────
 presidio-analyzer>=2.2.0,<3.0.0
