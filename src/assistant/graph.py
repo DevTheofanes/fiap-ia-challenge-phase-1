@@ -6,6 +6,7 @@ Nodes: classify_intent → retrieve_context → generate_response → validate_r
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import TypedDict
 
 from langchain_core.documents import Document
@@ -91,7 +92,7 @@ def build_graph():
 
     def validate_response(state: AssistantState) -> AssistantState:
         sources = [
-            doc.metadata.get("source", "unknown")
+            Path(doc.metadata["source"]).name if "source" in doc.metadata else "unknown"
             for doc in state.get("retrieved_docs", [])
         ]
         response = state["response"] + _DISCLAIMER
