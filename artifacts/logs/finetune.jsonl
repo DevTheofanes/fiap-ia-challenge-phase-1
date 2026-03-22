@@ -14,3 +14,6 @@
 {"timestamp": "2026-03-22T13:32:26.596379+00:00", "level": "INFO", "message": "training_start", "taskName": null, "stage": "training_start"}
 {"timestamp": "2026-03-22T15:06:05.402009+00:00", "level": "INFO", "message": "training_done", "taskName": null, "stage": "training_done", "train_loss": 1.2993587916031544, "steps": 462, "duration_sec": 5618.8}
 {"timestamp": "2026-03-22T15:06:05.766292+00:00", "level": "INFO", "message": "adapter_saved", "taskName": null, "stage": "adapter_saved", "path": "/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/finetune_checkpoints/final_adapter"}
+{"timestamp": "2026-03-22T23:50:05.416238+00:00", "level": "INFO", "message": "rouge_eval_start", "taskName": null, "stage": "rouge_eval_start", "split": "val", "num_samples": 50}
+{"timestamp": "2026-03-22T23:50:08.735555+00:00", "level": "INFO", "message": "rouge_eval_data_loaded", "taskName": null, "stage": "rouge_eval_data_loaded", "n": 50}
+{"timestamp": "2026-03-22T23:50:09.548856+00:00", "level": "INFO", "message": "rouge_eval_base_start", "taskName": null, "stage": "rouge_eval_base_start"}
