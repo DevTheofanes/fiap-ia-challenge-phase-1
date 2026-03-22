@@ -45,10 +45,15 @@ def _parse_features(features_str: str) -> str | None:
         return None
 
     artifact = joblib.load(BEST_MODEL_PATH)
-    model = artifact["model"] if isinstance(artifact, dict) else artifact
+    if isinstance(artifact, dict):
+        model = artifact["model"]
+        threshold = artifact.get("threshold", 0.5)
+    else:
+        model = artifact
+        threshold = 0.5
     X = np.array(values).reshape(1, -1)
     prob = model.predict_proba(X)[0][1]
-    label = "Malignant" if prob >= 0.5 else "Benign"
+    label = "Malignant" if prob >= threshold else "Benign"
     return f"ML Pipeline prediction: {prob:.0%} probability of malignancy ({label} — RF model)"
 
 
