@@ -1,7 +1,7 @@
 """M2 — Compare base vs fine-tuned LLaMA-3.2-1B using ROUGE metrics.
 
 Usage:
-    python scripts/eval_finetune.py                   # all 185 val samples
+    python scripts/eval_finetune.py                   # all 614 val samples
     python scripts/eval_finetune.py --num-samples 10  # quick check
 """
 from __future__ import annotations
