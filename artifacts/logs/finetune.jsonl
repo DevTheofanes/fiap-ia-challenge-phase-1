@@ -1,0 +1,16 @@
+{"timestamp": "2026-03-22T13:00:54.746419+00:00", "level": "INFO", "message": "finetune_start", "taskName": null, "stage": "finetune_start", "base_model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0", "lora_r": 8, "lora_alpha": 16, "epochs": 1, "batch_size": 2, "lr": 0.0003}
+{"timestamp": "2026-03-22T13:00:58.438750+00:00", "level": "INFO", "message": "loading_model", "taskName": null, "stage": "loading_model", "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0"}
+{"timestamp": "2026-03-22T13:01:31.590699+00:00", "level": "INFO", "message": "peft_applied", "taskName": null, "stage": "peft_applied", "trainable_params": 1126400, "total_params": 1101174784, "trainable_pct": 0.102}
+{"timestamp": "2026-03-22T13:01:31.591545+00:00", "level": "INFO", "message": "loading_data", "taskName": null, "stage": "loading_data"}
+{"timestamp": "2026-03-22T13:01:31.634189+00:00", "level": "INFO", "message": "data_loaded", "taskName": null, "stage": "data_loaded", "train_size": 2456, "val_size": 614}
+{"timestamp": "2026-03-22T13:01:33.218966+00:00", "level": "INFO", "message": "training_start", "taskName": null, "stage": "training_start"}
+{"timestamp": "2026-03-22T13:31:54.589192+00:00", "level": "INFO", "message": "training_done", "taskName": null, "stage": "training_done", "train_loss": 1.3909666763454773, "steps": 307, "duration_sec": 1821.4}
+{"timestamp": "2026-03-22T13:31:54.955706+00:00", "level": "INFO", "message": "adapter_saved", "taskName": null, "stage": "adapter_saved", "path": "/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/finetune_checkpoints/final_adapter"}
+{"timestamp": "2026-03-22T13:32:17.209018+00:00", "level": "INFO", "message": "finetune_start", "taskName": null, "stage": "finetune_start", "base_model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0", "lora_r": 8, "lora_alpha": 16, "epochs": 3, "batch_size": 4, "lr": 0.0003}
+{"timestamp": "2026-03-22T13:32:21.137580+00:00", "level": "INFO", "message": "loading_model", "taskName": null, "stage": "loading_model", "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0"}
+{"timestamp": "2026-03-22T13:32:25.081482+00:00", "level": "INFO", "message": "peft_applied", "taskName": null, "stage": "peft_applied", "trainable_params": 1126400, "total_params": 1101174784, "trainable_pct": 0.102}
+{"timestamp": "2026-03-22T13:32:25.082129+00:00", "level": "INFO", "message": "loading_data", "taskName": null, "stage": "loading_data"}
+{"timestamp": "2026-03-22T13:32:25.105576+00:00", "level": "INFO", "message": "data_loaded", "taskName": null, "stage": "data_loaded", "train_size": 2456, "val_size": 614}
+{"timestamp": "2026-03-22T13:32:26.596379+00:00", "level": "INFO", "message": "training_start", "taskName": null, "stage": "training_start"}
+{"timestamp": "2026-03-22T15:06:05.402009+00:00", "level": "INFO", "message": "training_done", "taskName": null, "stage": "training_done", "train_loss": 1.2993587916031544, "steps": 462, "duration_sec": 5618.8}
+{"timestamp": "2026-03-22T15:06:05.766292+00:00", "level": "INFO", "message": "adapter_saved", "taskName": null, "stage": "adapter_saved", "path": "/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/finetune_checkpoints/final_adapter"}
