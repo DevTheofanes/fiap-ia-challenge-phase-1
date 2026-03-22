@@ -135,10 +135,7 @@ def main() -> None:
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
-        tokenizer=tokenizer,
-        dataset_text_field=cfg.text_field,
-        max_seq_length=cfg.max_seq_length,
-        packing=False,
+        processing_class=tokenizer,
     )
 
     log_event(logger, "training_start")
