@@ -1,0 +1,50 @@
+Q: What are the treatments for Gastrointestinal Stromal Tumors ?
+A: Key Points
+                    - There are different types of treatment for patients with gastrointestinal stromal tumors.    - Four types of standard treatment are used:         - Surgery     - Targeted therapy     - Watchful waiting     - Supportive care        - New types of treatment are being tested in clinical trials.    - Patients may want to think about taking part in a clinical trial.    - Patients can enter clinical trials before, during, or after starting their cancer treatment.    - Follow-up tests may be needed.
+                
+                
+                    There are different types of treatment for patients with gastrointestinal stromal tumors.
+                    Different types of treatments are available for patients with gastrointestinal stromal tumors (GISTs). Some treatments are standard (the currently used treatment), and some are being tested in clinical trials. A treatment clinical trial is a research study meant to help improve current treatments or obtain information on new treatments for patients with cancer. When clinical trials show that a new treatment is better than the standard treatment, the new treatment may become the standard treatment. Patients may want to think about taking part in a clinical trial. Some clinical trials are open only to patients who have not started treatment.
+                
+                
+                    Four types of standard treatment are used:
+                    Surgery    If the GIST has not spread and is in a place where surgery can be safely done, the tumor and some of the tissue around it may be removed. Sometimes surgery is done using a laparoscope (a thin, lighted tube) to see inside the body. Small incisions (cuts) are made in the wall of the abdomen and a laparoscope is inserted into one of the incisions. Instruments may be inserted through the same incision or through other incisions to remove organs or tissues.        Targeted therapy     Targeted therapy is a type of treatment that uses drugs or other substances to identify and attack specific cancer cells without harming normal cells.      Tyrosine kinase inhibitors (TKIs) are targeted therapy drugs that block signals needed for tumors to grow. TKIs may be used to treat GISTs that cannot be removed by surgery or to shrink GISTs so they become small enough to be removed by surgery. Imatinib mesylate and sunitinib are two TKIs used to treat GISTs. TKIs are sometimes given for as long as the tumor does not grow and serious side effects do not occur.    See Drugs Approved for Gastrointestinal Stromal Tumors for more information.       Watchful waiting     Watchful waiting is closely monitoring a patients condition without giving any treatment until signs or symptoms appear or change.        Supportive care    If a GIST gets worse during treatment or there are side effects, supportive care is usually given. The goal of supportive care is to prevent or treat the symptoms of a disease, side effects caused by treatment, and psychological, social, and spiritual problems related to a disease or its treatment. Supportive care helps improve the quality of life of patients who have a serious or life-threatening disease. Radiation therapy is sometimes given as supportive care to relieve pain in patients with large tumors that have spread.
+                
+                
+                    New types of treatment are being tested in clinical trials.
+                    Information about clinical trials is available from the NCI website.
+                
+                
+                    Patients may want to think about taking part in a clinical trial.
+                    For some patients, taking part in a clinical trial may be the best treatment choice. Clinical trials are part of the cancer research process. Clinical trials are done to find out if new cancer treatments are safe and effective or better than the standard treatment.   Many of today's standard treatments for cancer are based on earlier clinical trials. Patients who take part in a clinical trial may receive the standard treatment or be among the first to receive a new treatment.   Patients who take part in clinical trials also help improve the way cancer will be treated in the future. Even when clinical trials do not lead to effective new treatments, they often answer important questions and help move research forward.
+                
+                
+                    Patients can enter clinical trials before, during, or after starting their cancer treatment.
+                    Some clinical trials only include patients who have not yet received treatment. Other trials test treatments for patients whose cancer has not gotten better. There are also clinical trials that test new ways to stop cancer from recurring (coming back) or reduce the side effects of cancer treatment.   Clinical trials are taking place in many parts of the country. See the Treatment Options section that follows for links to current treatment clinical trials. These have been retrieved from NCI's listing of clinical trials.
+                
+                
+                    Follow-up tests may be needed.
+                    Some of the tests that were done to diagnose the cancer or to find out the stage of the cancer may be repeated. Some tests will be repeated in order to see how well the treatment is working. Decisions about whether to continue, change, or stop treatment may be based on the results of these tests.   Some of the tests will continue to be done from time to time after treatment has ended. The results of these tests can show if your condition has changed or if the cancer has recurred (come back). These tests are sometimes called follow-up tests or check-ups.   Follow-up for GISTs that were removed by surgery may include CT scan of the liver and pelvis or watchful waiting. For GISTs that are treated with tyrosine kinase inhibitors, follow-up tests, such as CT, MRI, or PET scans, may be done to check how well the targeted therapy is working.
+                                
+                
+				            Treatment Options for Gastrointestinal Stromal Tumors
+				            
+				                
+				                    Resectable Gastrointestinal Stromal Tumors
+				                    Resectable gastrointestinal stromal tumors (GISTs) can be completely or almost completely removed by surgery. Treatment may include the following:         - Surgery to remove tumors that are 2 centimeters or larger. Laparoscopic surgery may be done if the tumor is 5 cm or smaller. If there are cancer cells remaining at the edges of the area where the tumor was removed, watchful waiting or targeted therapy with imatinib mesylate may follow.    - A clinical trial of targeted therapy with imatinib mesylate following surgery, to decrease the chance the tumor will recur (come back).
+				                
+				                
+				                    Unresectable Gastrointestinal Stromal Tumors
+				                    Unresectable GISTs cannot be completely removed by surgery because they are too large or in a place where there would be too much damage to nearby organs if the tumor is removed. Treatment is usually a clinical trial of targeted therapy with imatinib mesylate to shrink the tumor, followed by surgery to remove as much of the tumor as possible.
+				                
+				                
+				                    Metastatic and Recurrent Gastrointestinal Stromal Tumors
+				                    Treatment of GISTs that are metastatic (spread to other parts of the body) or recurrent (came back after treatment) may include the following:         -  Targeted therapy with imatinib mesylate.     - Targeted therapy with sunitinib, if the tumor begins to grow during imatinib mesylate therapy or if the side effects are too bad.     -  Surgery to remove tumors that have been treated with targeted therapy and are shrinking, stable (not changing), or that have slightly increased in size. Targeted therapy may continue after surgery.     - Surgery to remove tumors when there are serious complications, such as bleeding, a hole in the gastrointestinal (GI) tract, a blocked GI tract, or infection.     - A clinical trial of a new treatment.
+				                
+				                
+				                    Refractory Gastrointestinal Stromal Tumors
+				                    Many GISTs treated with a tyrosine kinase inhibitor (TKI) become refractory (stop responding) to the drug after a while. Treatment is usually a clinical trial with a different TKI or a clinical trial of a new drug.
+				                
+				                
+				                    Treatment Options in Clinical Trials
+				                    Check the list of NCI-supported cancer clinical trials that are now accepting patients with gastrointestinal stromal tumor. For more specific results, refine the search by using other search features, such as the location of the trial, the type of treatment, or the name of the drug. Talk with your doctor about clinical trials that may be right for you. General information about clinical trials is available from the NCI website.

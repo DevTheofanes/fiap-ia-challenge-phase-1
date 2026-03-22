@@ -1,0 +1,2 @@
+{"timestamp": "2026-03-22T15:07:28.339606+00:00", "level": "INFO", "message": "build_kb", "taskName": null, "stage": "build_kb", "files_written": 729, "kb_dir": "/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/data/kb"}
+{"timestamp": "2026-03-22T15:07:51.557463+00:00", "level": "INFO", "message": "build_vectorstore", "taskName": null, "stage": "build_vectorstore", "vectorstore_dir": "/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/artifacts/vectorstore"}

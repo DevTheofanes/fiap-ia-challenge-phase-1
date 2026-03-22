@@ -31,3 +31,6 @@ artifacts/logs/finetune_prep.jsonl
 
 # Fine-tune checkpoints (large, not tracked)
 artifacts/finetune_checkpoints/
+
+# ChromaDB vectorstore (generated artifact, large)
+artifacts/vectorstore/
