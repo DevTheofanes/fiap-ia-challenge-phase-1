@@ -20,12 +20,12 @@ rouge-score>=0.1.2
 huggingface_hub>=0.23.0
 
 # ── Phase 3: LangChain + Vector Store ──────────────────────────
-langchain>=0.2.0
-langchain-community>=0.2.0
-langchain-google-genai>=1.0.0
-langchain-huggingface>=0.0.3
-langgraph>=0.1.0
-chromadb>=0.5.0
+langchain>=1.2.0,<3.0.0
+langchain-community>=0.4.0,<2.0.0
+langchain-google-genai>=4.2.0,<6.0.0
+langchain-huggingface>=1.2.0,<3.0.0
+langgraph>=1.1.0,<3.0.0
+chromadb>=1.5.0,<3.0.0
 sentence-transformers>=2.7.0,<4.0.0
 
 # ── Phase 3: PII Anonymization ──────────────────────────────────

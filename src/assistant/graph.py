@@ -70,14 +70,17 @@ def build_graph():
             prompt = _CLASSIFY_PROMPT.format(query=state["query"])
             result = llm.invoke(prompt)
             text = result.content.strip().lower()
-            intent = "medical" if "medical" in text else "out_of_scope"
+            intent = "medical" if text == "medical" or text.startswith("medical") else "out_of_scope"
         except Exception as exc:
             intent = "out_of_scope"
             return {**state, "intent": intent, "error": str(exc)}
         return {**state, "intent": intent, "error": None}
 
     def retrieve_context(state: AssistantState) -> AssistantState:
-        docs = retriever.invoke(state["query"])
+        try:
+            docs = retriever.invoke(state["query"])
+        except Exception as exc:
+            return {**state, "retrieved_docs": [], "error": str(exc)}
         return {**state, "retrieved_docs": docs}
 
     def generate_response(state: AssistantState) -> AssistantState:
@@ -112,6 +115,7 @@ def build_graph():
             sources=[],
             response_len=len(_REFUSAL_MSG),
             refused=True,
+            error=state.get("error"),
         )
         return {**state, "response": _REFUSAL_MSG, "sources": [], "refused": True}
 
