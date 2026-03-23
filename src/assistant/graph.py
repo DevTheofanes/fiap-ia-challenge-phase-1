@@ -13,14 +13,13 @@ from langchain_core.documents import Document
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import END, StateGraph
 
+from src.assistant import audit_logger, explainer, guardrails
 from src.assistant.chain import build_chain
+from src.assistant.guardrails import _DISCLAIMER
 from src.assistant.retriever import get_retriever
 from src.config import ASSISTANT_LOG_PATH, VECTORSTORE_DIR
 from src.logging_utils import log_event, setup_json_logger
 
-_DISCLAIMER = (
-    "\n\n⚠ Esta informação é educacional e não substitui consulta médica profissional."
-)
 _REFUSAL_MSG = (
     "Posso responder apenas perguntas médicas relacionadas a oncologia e diagnóstico. "
     "Por favor, reformule sua pergunta dentro desse escopo."
@@ -67,6 +66,9 @@ def build_graph():
     # ── Node functions ────────────────────────────────────────────
 
     def classify_intent(state: AssistantState) -> AssistantState:
+        is_blocked, refusal_message = guardrails.filter_input(state["query"])
+        if is_blocked:
+            return {**state, "intent": "out_of_scope", "response": refusal_message, "error": None}
         try:
             prompt = _CLASSIFY_PROMPT.format(query=state["query"])
             result = llm.invoke(prompt)
@@ -95,7 +97,27 @@ def build_graph():
             Path(doc.metadata["source"]).name if "source" in doc.metadata else "unknown"
             for doc in state.get("retrieved_docs", [])
         ]
-        response = state["response"] + _DISCLAIMER
+        response = guardrails.filter_output(state["response"])
+        explanation = explainer.explain_prediction(
+            query=state["query"],
+            response=response,
+            sources=sources,
+            ml_context=state["ml_context"],
+        )
+        if explanation:
+            # _DISCLAIMER imported from guardrails — single source of truth
+            response = response.replace(
+                _DISCLAIMER,
+                f"\n\nExplanation: {explanation}{_DISCLAIMER}",
+            )
+        audit_logger.log_interaction(
+            user_query=state["query"],
+            retrieved_docs=sources,
+            model_response=response,
+            guardrail_triggered=False,
+            intent=state["intent"],
+            error=state.get("error"),
+        )
         log_event(
             logger,
             "interaction",
@@ -108,17 +130,26 @@ def build_graph():
         return {**state, "response": response, "sources": sources, "refused": False}
 
     def refuse_response(state: AssistantState) -> AssistantState:
+        final_response = state.get("response") or _REFUSAL_MSG
+        audit_logger.log_interaction(
+            user_query=state["query"],
+            retrieved_docs=[],
+            model_response=final_response,
+            guardrail_triggered=True,
+            intent=state["intent"],
+            error=state.get("error"),
+        )
         log_event(
             logger,
             "interaction",
             query=state["query"],
             intent=state["intent"],
             sources=[],
-            response_len=len(_REFUSAL_MSG),
+            response_len=len(final_response),
             refused=True,
             error=state.get("error"),
         )
-        return {**state, "response": _REFUSAL_MSG, "sources": [], "refused": True}
+        return {**state, "response": final_response, "sources": [], "refused": True}
 
     def route_intent(state: AssistantState) -> str:
         if state.get("intent") == "medical":
