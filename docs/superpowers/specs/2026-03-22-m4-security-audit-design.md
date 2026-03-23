@@ -72,6 +72,8 @@ def log_interaction(
     """Appends one structured record to artifacts/logs/audit.jsonl.
 
     Uses setup_json_logger + log_event from src/logging_utils.py.
+    Logger name: "audit"
+    Path constant: AUDIT_LOG_PATH from src.config (artifacts/logs/audit.jsonl)
     Logger is module-level singleton (initialized once on first call).
 
     Required fields in output: timestamp, user_query, retrieved_docs,
@@ -82,8 +84,13 @@ def log_interaction(
 
 ### `src/assistant/explainer.py`
 
+The milestone requires a function named `explain_prediction`. The function receives
+already-computed assistant state (no ML model re-execution) and wraps Gemini to produce
+a citation-based explanation — the name reflects its role as explainer of the assistant's
+prediction/response.
+
 ```python
-def explain_response(
+def explain_prediction(
     *,
     query: str,
     response: str,
@@ -114,27 +121,68 @@ Graph topology: **unchanged** (same 5 nodes, same edges).
 ### `classify_intent` node
 
 ```
-+ calls guardrails.filter_input(query)
-+ if blocked → sets intent="out_of_scope", skips LLM call
-  else → LLM classification as before
++ calls guardrails.filter_input(query) → (is_blocked, refusal_message)
++ if is_blocked:
+    sets intent="out_of_scope"
+    sets response=refusal_message (overrides _REFUSAL_MSG in refuse_response)
+    skips LLM call
+  else:
+    LLM classification as before
 ```
+
+If `filter_input` blocks the query, `state["response"]` is set to the `refusal_message`
+returned by `filter_input`. The `refuse_response` node then uses `state["response"]` if
+already set, otherwise falls back to `_REFUSAL_MSG`.
 
 ### `validate_response` node
 
+The existing `response = state["response"] + _DISCLAIMER` line is **removed**.
+`filter_output` becomes the sole owner of disclaimer injection.
+
 ```
-response = guardrails.filter_output(raw_response)
-explanation = explainer.explain_response(query, response, sources, ml_context)
+# raw_response is state["response"] — chain output, no disclaimer yet
+# Reuse existing sources extraction already present in validate_response:
+#   sources = [Path(doc.metadata["source"]).name if "source" in doc.metadata else "unknown"
+#              for doc in state.get("retrieved_docs", [])]
+response = guardrails.filter_output(raw_response)        # appends disclaimer
+explanation = explainer.explain_prediction(
+    query=state["query"],
+    response=response,
+    sources=sources,
+    ml_context=state["ml_context"],
+)
 if explanation:
-    response += "\n\nExplanation: " + explanation
-+ audit_logger.log_interaction(guardrail_triggered=False, ...)
-  existing log_event() call kept as-is
+    # insert explanation between answer body and disclaimer
+    response = response.replace(_DISCLAIMER, f"\n\nExplanation: {explanation}{_DISCLAIMER}")
+audit_logger.log_interaction(
+    user_query=state["query"],
+    retrieved_docs=sources,          # list[str] filenames, not Document objects
+    model_response=response,
+    guardrail_triggered=False,
+    intent=state["intent"],
+    error=state.get("error"),
+)
+existing log_event() call kept as-is
 ```
 
 ### `refuse_response` node
 
+The existing `return {**state, "response": _REFUSAL_MSG, ...}` line is updated to use
+`state.get("response") or _REFUSAL_MSG` so that when `classify_intent` placed a
+guardrail-specific message into `state["response"]`, it is preserved.
+
 ```
-+ audit_logger.log_interaction(guardrail_triggered=True, ...)
-  existing log_event() call kept as-is
+final_response = state.get("response") or _REFUSAL_MSG
+audit_logger.log_interaction(
+    user_query=state["query"],
+    retrieved_docs=[],
+    model_response=final_response,
+    guardrail_triggered=True,
+    intent=state["intent"],
+    error=state.get("error"),
+)
+existing log_event() call kept as-is
+return {**state, "response": final_response, "sources": [], "refused": True}
 ```
 
 ---
@@ -151,7 +199,7 @@ Explanation: {1-2 sentences citing sources, from explainer.py}
 ⚠ Esta informação é educacional e não substitui consulta médica profissional.
 ```
 
-If `explain_response()` returns empty string, the Explanation block is omitted.
+If `explain_prediction()` returns empty string, the Explanation block is omitted.
 
 ### `audit.jsonl` record shape
 
@@ -199,7 +247,7 @@ Fallback string: `"Based on: {sources_joined}."`
 |------|--------|
 | `src/assistant/guardrails.py` | Implement `filter_input()`, `filter_output()` |
 | `src/assistant/audit_logger.py` | Implement `log_interaction()` |
-| `src/assistant/explainer.py` | Implement `explain_response()` |
+| `src/assistant/explainer.py` | Implement `explain_prediction()` |
 | `src/assistant/graph.py` | Delegate to M4 modules in 3 node functions |
 
 No new files. No new graph nodes. No new CLI commands.
