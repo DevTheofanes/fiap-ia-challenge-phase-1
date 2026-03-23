@@ -97,7 +97,9 @@ def build_graph():
             Path(doc.metadata["source"]).name if "source" in doc.metadata else "unknown"
             for doc in state.get("retrieved_docs", [])
         ]
-        response = guardrails.filter_output(state["response"])
+        original_response = state["response"]
+        response = guardrails.filter_output(original_response)
+        output_guardrail_fired = response != original_response
         explanation = explainer.explain_prediction(
             query=state["query"],
             response=response,
@@ -114,7 +116,7 @@ def build_graph():
             user_query=state["query"],
             retrieved_docs=sources,
             model_response=response,
-            guardrail_triggered=False,
+            guardrail_triggered=output_guardrail_fired,
             intent=state["intent"],
             error=state.get("error"),
         )
