@@ -1,21 +1,28 @@
 import json
-import tempfile
+import logging
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+import src.assistant.audit_logger as audit_logger_mod
 from src.assistant.audit_logger import log_interaction
+
+
+@pytest.fixture(autouse=True)
+def reset_audit_logger():
+    """Reset the audit logger singleton and clear logging handlers between tests."""
+    yield
+    audit_logger = logging.getLogger("audit")
+    for handler in list(audit_logger.handlers):
+        handler.close()
+        audit_logger.removeHandler(handler)
+    audit_logger_mod._logger = None
 
 
 def test_log_interaction_writes_required_fields(tmp_path):
     audit_path = tmp_path / "audit.jsonl"
     with patch("src.assistant.audit_logger.AUDIT_LOG_PATH", audit_path):
-        # Reset the module-level logger so it picks up the patched path
-        # (without this, the singleton would still point to the real AUDIT_LOG_PATH)
-        import src.assistant.audit_logger as mod
-        mod._logger = None
-
         log_interaction(
             user_query="What is oncology?",
             retrieved_docs=["medquad.txt"],
@@ -39,9 +46,6 @@ def test_log_interaction_writes_required_fields(tmp_path):
 def test_log_interaction_guardrail_triggered(tmp_path):
     audit_path = tmp_path / "audit.jsonl"
     with patch("src.assistant.audit_logger.AUDIT_LOG_PATH", audit_path):
-        import src.assistant.audit_logger as mod
-        mod._logger = None
-
         log_interaction(
             user_query="What's the weather?",
             retrieved_docs=[],
