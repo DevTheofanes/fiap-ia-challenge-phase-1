@@ -1,5 +1,5 @@
 import pytest
-from src.assistant.guardrails import filter_input, filter_output
+from src.assistant.guardrails import filter_input, filter_output, _DISCLAIMER
 
 # ── filter_input ──────────────────────────────────────────────
 
@@ -31,8 +31,6 @@ def test_filter_input_oncology_passes():
 
 # ── filter_output ─────────────────────────────────────────────
 
-_DISCLAIMER = "\n\n⚠ Esta informação é educacional e não substitui consulta médica profissional."
-
 def test_filter_output_appends_disclaimer():
     result = filter_output("Some medical answer.")
     assert _DISCLAIMER in result
@@ -46,6 +44,8 @@ def test_filter_output_softens_definitive_diagnosis():
     response = "You have cancer and the diagnosis is confirmed."
     result = filter_output(response)
     assert "you have cancer" not in result.lower()
+    assert "findings are consistent with possible" in result.lower()
+    assert "the preliminary indication is" in result.lower()
 
 def test_filter_output_preserves_normal_response():
     response = "Breast cancer symptoms may include a lump or skin changes."

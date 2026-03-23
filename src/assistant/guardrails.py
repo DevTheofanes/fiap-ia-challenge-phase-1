@@ -13,7 +13,7 @@ _DISCLAIMER = (
 
 _OFF_TOPIC_PATTERNS = re.compile(
     r"\b(weather|clima|temperatura|sports|futebol|soccer|football|stock|bolsa|bitcoin|"
-    r"crypto|recipe|receita culin|movie|filme|music|m[uú]sica|política|política|politics|"
+    r"crypto|recipe|receita culin|movie|filme|music|m[uú]sica|política|politics|"
     r"lottery|loteria|horoscope|hor[oó]scopo)\b",
     re.IGNORECASE,
 )
@@ -70,6 +70,8 @@ def filter_input(query: str) -> tuple[bool, str | None]:
 
 def filter_output(response: str) -> str:
     """Appends disclaimer if absent; softens definitive diagnosis phrasing."""
+    if not isinstance(response, str):
+        return _DISCLAIMER.lstrip()
     for pattern, replacement in _DEFINITIVE_DIAGNOSIS_PATTERNS:
         response = pattern.sub(replacement, response)
 
