@@ -20,10 +20,6 @@ from src.assistant.retriever import get_retriever
 from src.config import ASSISTANT_LOG_PATH, VECTORSTORE_DIR
 from src.logging_utils import log_event, setup_json_logger
 
-_REFUSAL_MSG = (
-    "Posso responder apenas perguntas médicas relacionadas a oncologia e diagnóstico. "
-    "Por favor, reformule sua pergunta dentro desse escopo."
-)
 _CLASSIFY_PROMPT = (
     "Classify the following question as either 'medical' (related to medicine, "
     "oncology, cancer, diagnosis, treatment, symptoms, anatomy, or clinical topics) "
@@ -98,8 +94,8 @@ def build_graph():
             for doc in state.get("retrieved_docs", [])
         ]
         original_response = state["response"]
+        output_guardrail_fired = guardrails.has_definitive_diagnosis(original_response)
         response = guardrails.filter_output(original_response)
-        output_guardrail_fired = response != original_response
         explanation = explainer.explain_prediction(
             query=state["query"],
             response=response,
@@ -132,7 +128,7 @@ def build_graph():
         return {**state, "response": response, "sources": sources, "refused": False}
 
     def refuse_response(state: AssistantState) -> AssistantState:
-        final_response = state.get("response") or _REFUSAL_MSG
+        final_response = state.get("response") or guardrails._INPUT_REFUSAL
         audit_logger.log_interaction(
             user_query=state["query"],
             retrieved_docs=[],

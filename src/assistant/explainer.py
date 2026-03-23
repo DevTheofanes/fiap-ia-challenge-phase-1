@@ -5,6 +5,7 @@ the assistant gave a particular response.
 """
 from __future__ import annotations
 
+import logging
 import os
 
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -25,7 +26,7 @@ Assistant response (excerpt): {response_excerpt}
 Reply in the same language as the question. Be concise."""
 
 _llm: ChatGoogleGenerativeAI | None = None
-_logger = None
+_logger: logging.Logger | None = None
 
 
 def _get_llm() -> ChatGoogleGenerativeAI:
@@ -39,7 +40,7 @@ def _get_llm() -> ChatGoogleGenerativeAI:
     return _llm
 
 
-def _get_logger():
+def _get_logger() -> logging.Logger:
     global _logger
     if _logger is None:
         _logger = setup_json_logger("explainer", ASSISTANT_LOG_PATH)
@@ -68,7 +69,7 @@ def explain_prediction(
         return fallback
 
     ml_context_block = f"ML Pipeline Context: {ml_context}\n" if ml_context else ""
-    response_excerpt = response[:300]
+    response_excerpt = response[:300]  # limit prompt token usage
 
     prompt = _PROMPT_TEMPLATE.format(
         query=query,

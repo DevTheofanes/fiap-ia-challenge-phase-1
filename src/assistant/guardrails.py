@@ -68,6 +68,13 @@ def filter_input(query: str) -> tuple[bool, str | None]:
     return False, None
 
 
+def has_definitive_diagnosis(response: str) -> bool:
+    """Return True if response contains definitive diagnosis phrasing that filter_output would soften."""
+    if not isinstance(response, str):
+        return False
+    return any(pattern.search(response) for pattern, _ in _DEFINITIVE_DIAGNOSIS_PATTERNS)
+
+
 def filter_output(response: str) -> str:
     """Appends disclaimer if absent; softens definitive diagnosis phrasing."""
     if not isinstance(response, str):
