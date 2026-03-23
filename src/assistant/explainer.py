@@ -7,6 +7,11 @@ from __future__ import annotations
 
 import os
 
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+from src.config import ASSISTANT_LOG_PATH
+from src.logging_utils import log_event, setup_json_logger
+
 _PROMPT_TEMPLATE = """\
 You are assisting a doctor reviewing a medical assistant's response.
 In 1-2 sentences, explain why the assistant gave this answer, \
@@ -18,6 +23,27 @@ Sources consulted: {sources}
 Assistant response (excerpt): {response_excerpt}
 
 Reply in the same language as the question. Be concise."""
+
+_llm: ChatGoogleGenerativeAI | None = None
+_logger = None
+
+
+def _get_llm() -> ChatGoogleGenerativeAI:
+    global _llm
+    if _llm is None:
+        _llm = ChatGoogleGenerativeAI(
+            model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
+            google_api_key=os.getenv("GEMINI_API_KEY"),
+            temperature=0.1,
+        )
+    return _llm
+
+
+def _get_logger():
+    global _logger
+    if _logger is None:
+        _logger = setup_json_logger("explainer", ASSISTANT_LOG_PATH)
+    return _logger
 
 
 def explain_prediction(
@@ -52,14 +78,8 @@ def explain_prediction(
     )
 
     try:
-        from langchain_google_genai import ChatGoogleGenerativeAI
-
-        llm = ChatGoogleGenerativeAI(
-            model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
-            google_api_key=os.getenv("GEMINI_API_KEY"),
-            temperature=0.1,
-        )
-        result = llm.invoke(prompt)
+        result = _get_llm().invoke(prompt)
         return result.content.strip()
-    except Exception:
+    except Exception as exc:
+        log_event(_get_logger(), "explainer_fallback", error=str(exc), sources=sources)
         return fallback
