@@ -114,12 +114,6 @@ def main() -> None:
         result = graph.invoke(state)
 
         print(f"\nAssistant: {result['answer']}")
-
-        if result.get("kb_sources"):
-            print(f"KB Sources: {', '.join(result['kb_sources'])}")
-        if result.get("patient_source"):
-            print(f"Patient Source: {result['patient_source']}")
-
         print()
 
 

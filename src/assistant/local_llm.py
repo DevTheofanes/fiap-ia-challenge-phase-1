@@ -14,6 +14,25 @@ class LocalModelInitializationError(RuntimeError):
     """Raised when the local assistant model cannot be initialized."""
 
 
+class LocalModelOutputError(RuntimeError):
+    """Raised when the local model generates unusable output (garbage/repetition)."""
+
+
+def _is_garbage(text: str) -> bool:
+    """Return True if the output is clearly structured garbage (key=value spam).
+
+    Only blocks outputs with a high ratio of `=` signs, which indicates the model
+    generated structured data instead of natural language. Medical text that repeats
+    clinical terms is NOT considered garbage.
+    """
+    if not text:
+        return True
+
+    # key=value spam (e.g. "tumor_stage=IIIA; tumor_stage=IIIA; ...")
+    eq_ratio = text.count("=") / max(len(text), 1)
+    return eq_ratio > 0.08
+
+
 @dataclass
 class LocalAssistantLLM:
     """Thin inference wrapper around the fine-tuned TinyLlama adapter."""
@@ -73,7 +92,7 @@ class LocalAssistantLLM:
             prompt,
             return_tensors="pt",
             truncation=True,
-            max_length=self.config.max_seq_length,
+            max_length=2048,  # TinyLlama's full context window; max_seq_length=256 is training-only
         )
         inputs = {key: value.to(self._model.device) for key, value in inputs.items()}
 
@@ -81,13 +100,34 @@ class LocalAssistantLLM:
             outputs = self._model.generate(
                 **inputs,
                 max_new_tokens=max_new_tokens,
-                do_sample=False,
-                temperature=0.0,
+                do_sample=True,
+                temperature=0.3,
+                top_p=0.9,
                 pad_token_id=self._tokenizer.eos_token_id,
             )
 
         generated = outputs[0][inputs["input_ids"].shape[1]:]
-        return self._tokenizer.decode(generated, skip_special_tokens=True).strip()
+        text = self._tokenizer.decode(generated, skip_special_tokens=True).strip()
+
+        # TinyLlama sometimes echoes prompt sections back; truncate at the first
+        # occurrence of any section header that belongs to the input prompt.
+        _STOP_PHRASES = [
+            "Patient Context",
+            "Knowledge Base Context",
+            "Question\n",
+            "\n\nAnswer:",
+        ]
+        for phrase in _STOP_PHRASES:
+            idx = text.find(phrase)
+            if idx > 0:
+                text = text[:idx].strip()
+
+        if _is_garbage(text):
+            raise LocalModelOutputError(
+                "Local model produced unusable output — triggering fallback."
+            )
+
+        return text
 
 
 def allow_fallback() -> bool:

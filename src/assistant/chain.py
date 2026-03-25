@@ -22,20 +22,18 @@ def build_generation_prompt(
     patient_context: str,
     kb_context: str,
 ) -> str:
-    """Build the final generation prompt for the local assistant model."""
-    return (
-        "You are a medical oncology assistant helping doctors.\n"
-        "Use the provided Patient Context and Knowledge Base Context only.\n"
-        "Do not prescribe medication.\n"
-        "Do not make definitive diagnoses.\n"
-        "If information is insufficient, say so clearly.\n"
-        "Answer in the same language as the question.\n"
-        "Do not fabricate sources.\n\n"
-        "Patient Context\n"
-        f"{patient_context}\n\n"
-        "Knowledge Base Context\n"
-        f"{kb_context}\n\n"
-        "Question\n"
-        f"{question}\n\n"
-        "Answer:"
-    )
+    """Build the generation prompt using the same format as fine-tuning training data."""
+    context_parts: list[str] = []
+
+    _no_patient = "No patient-specific context provided."
+    if patient_context and patient_context.strip() and patient_context.strip() != _no_patient:
+        context_parts.append(f"Patient information:\n{patient_context.strip()}")
+
+    _no_kb = "No relevant knowledge base context found."
+    if kb_context and kb_context.strip() and kb_context.strip() != _no_kb:
+        context_parts.append(f"Medical reference:\n{kb_context.strip()}")
+
+    if context_parts:
+        context_block = "\n\n".join(context_parts)
+        return f"### Question: {question}\n\nContext:\n{context_block}\n\n### Answer:"
+    return f"### Question: {question}\n\n### Answer:"

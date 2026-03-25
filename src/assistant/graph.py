@@ -12,6 +12,7 @@ from src.assistant.chain import build_generation_prompt, format_kb_context
 from src.assistant.local_llm import (
     LocalAssistantLLM,
     LocalModelInitializationError,
+    LocalModelOutputError,
     allow_fallback,
 )
 from src.assistant.retriever import get_retriever
@@ -55,35 +56,42 @@ def _build_generator() -> tuple[LocalAssistantLLM, Any | None]:
     return LocalAssistantLLM(), get_llm_client() if allow_fallback() else None
 
 
+_MEDICAL_KEYWORDS = (
+    "cancer", "oncology", "tumor", "tumour", "diagnosis", "diagnostic",
+    "treatment", "biopsy", "breast", "malignan", "bi-rads", "birads",
+    "radiology", "imaging", "lesion", "lump", "lymph", "chemo", "radiation",
+    "pathology", "histology", "staging", "metastas", "carcinoma", "sarcoma",
+    "prognosis", "surgery", "hormone", "receptor", "mammogram", "ultrasound",
+    "mri", "pet scan", "biopsia", "tumor", "câncer", "cancer", "oncologia",
+    "diagnóstico", "tratamento", "mama", "linfonodo", "quimio", "radioterapia",
+)
+
+
+def _keyword_classify(query: str) -> str:
+    text = query.lower()
+    return "medical" if any(k in text for k in _MEDICAL_KEYWORDS) else "out_of_scope"
+
+
 def _classify_query(query: str, classifier: Any | None) -> str:
     if classifier is None:
-        keywords = (
-            "cancer",
-            "oncology",
-            "tumor",
-            "tumour",
-            "diagnosis",
-            "diagnostic",
-            "treatment",
-            "biopsy",
-            "breast",
-            "malignan",
-        )
-        text = query.lower()
-        return "medical" if any(keyword in text for keyword in keywords) else "out_of_scope"
+        return _keyword_classify(query)
 
-    result = classifier.generate(_CLASSIFY_PROMPT.format(query=query), temperature=0.0, max_tokens=16)
-    text = result.text.strip().lower()
-    return "medical" if text == "medical" or text.startswith("medical") else "out_of_scope"
+    try:
+        result = classifier.generate(_CLASSIFY_PROMPT.format(query=query), temperature=0.0, max_tokens=16)
+        text = result.text.strip().lower()
+        return "medical" if text == "medical" or text.startswith("medical") else "out_of_scope"
+    except Exception:
+        # Gemini classifier unavailable — fall back to keyword matching
+        return _keyword_classify(query)
 
 
 def _generate_with_policy(prompt: str, local_llm: LocalAssistantLLM, fallback_llm: Any | None) -> str:
     try:
         return local_llm.generate(prompt)
-    except LocalModelInitializationError:
+    except (LocalModelInitializationError, LocalModelOutputError):
         if fallback_llm is None:
             raise
-        result = fallback_llm.generate(prompt, temperature=0.2, max_tokens=256)
+        result = fallback_llm.generate(prompt, temperature=0.2, max_tokens=512)
         return result.text.strip()
 
 
@@ -103,10 +111,7 @@ def build_graph():
                 "answer": refusal_message or guardrails._INPUT_REFUSAL,
                 "error": None,
             }
-        try:
-            intent = _classify_query(state["query"], classifier)
-        except Exception as exc:
-            return {**state, "intent": "out_of_scope", "error": str(exc)}
+        intent = _classify_query(state["query"], classifier)
         return {**state, "intent": intent, "error": None}
 
     def retrieve_kb_context(state: AssistantState) -> AssistantState:
