@@ -52,7 +52,8 @@ def explain_prediction(
     query: str,
     response: str,
     sources: list[str],
-    ml_context: str | None = None,
+    patient_source: str | None = None,
+    ml_context: dict | str | None = None,
 ) -> str:
     """Uses Gemini to produce a 1-2 sentence explanation citing sources.
 
@@ -62,7 +63,12 @@ def explain_prediction(
     if not sources:
         return ""
 
-    sources_joined = ", ".join(sources)
+    source_parts = []
+    if patient_source:
+        source_parts.append(patient_source)
+    if sources:
+        source_parts.extend(sources)
+    sources_joined = ", ".join(source_parts)
     fallback = f"Based on: {sources_joined}."
 
     if os.getenv("LLM_USE_MOCK", "false").lower() == "true":

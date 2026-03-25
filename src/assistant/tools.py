@@ -1,5 +1,9 @@
-"""Optional LangChain tools for the medical assistant (M3).
+"""Helper tools for the medical assistant."""
+from __future__ import annotations
 
-Planned: PubMed search, ICD-10 lookup.
-"""
-# TODO(M3): implement tools
+from src.assistant.patient_store import load_patient_record
+
+
+def lookup_patient_record(patient_id: str):
+    """Return one structured patient record by id."""
+    return load_patient_record(patient_id)

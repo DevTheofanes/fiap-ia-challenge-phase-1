@@ -28,6 +28,10 @@ def log_interaction(
     guardrail_triggered: bool,
     intent: str | None = None,
     error: str | None = None,
+    patient_id: str | None = None,
+    patient_context_used: bool | None = None,
+    kb_sources: list[str] | None = None,
+    patient_source: str | None = None,
 ) -> None:
     """Appends one structured record to artifacts/logs/audit.jsonl.
 
@@ -44,4 +48,8 @@ def log_interaction(
         guardrail_triggered=guardrail_triggered,
         intent=intent,
         error=error,
+        patient_id=patient_id,
+        patient_context_used=patient_context_used,
+        kb_sources=kb_sources,
+        patient_source=patient_source,
     )

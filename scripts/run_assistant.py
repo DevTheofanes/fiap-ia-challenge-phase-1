@@ -4,9 +4,11 @@
 Usage:
     python scripts/run_assistant.py
     python scripts/run_assistant.py --features "17.99,10.38,122.8,1001,0.118,..."
+    python scripts/run_assistant.py --patient-id P-0001
 
 The --features flag accepts 30 comma-separated float values (Wisconsin dataset
-feature order) and injects an ML prediction into the assistant context.
+feature order) and injects an ML prediction into the assistant context when
+no patient record is provided.
 """
 from __future__ import annotations
 
@@ -60,6 +62,12 @@ def _parse_features(features_str: str) -> str | None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Medical assistant CLI (M3)")
     parser.add_argument(
+        "--patient-id",
+        type=str,
+        default=None,
+        help="Synthetic patient record id under data/patients/",
+    )
+    parser.add_argument(
         "--features",
         type=str,
         default=None,
@@ -68,7 +76,7 @@ def main() -> None:
     args = parser.parse_args()
 
     ml_context: str | None = None
-    if args.features:
+    if args.features and not args.patient_id:
         ml_context = _parse_features(args.features)
         if ml_context:
             print(f"ML context: {ml_context}\n")
@@ -89,22 +97,28 @@ def main() -> None:
 
         state = {
             "query": query,
+            "patient_id": args.patient_id,
             "intent": "",
             "retrieved_docs": [],
-            "ml_context": ml_context,
-            "response": "",
-            "sources": [],
+            "kb_context": "",
+            "patient_record": None,
+            "patient_context": ml_context or "No patient-specific context provided.",
+            "answer": "",
+            "kb_sources": [],
+            "patient_source": None,
+            "used_patient_context": False,
             "refused": False,
             "error": None,
         }
 
         result = graph.invoke(state)
 
-        print(f"\nAssistant: {result['response']}")
+        print(f"\nAssistant: {result['answer']}")
 
-        if result.get("sources"):
-            unique_sources = sorted(set(result["sources"]))
-            print(f"Sources: {', '.join(unique_sources)}")
+        if result.get("kb_sources"):
+            print(f"KB Sources: {', '.join(result['kb_sources'])}")
+        if result.get("patient_source"):
+            print(f"Patient Source: {result['patient_source']}")
 
         print()
 

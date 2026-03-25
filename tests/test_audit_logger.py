@@ -30,6 +30,10 @@ def test_log_interaction_writes_required_fields(tmp_path):
             guardrail_triggered=False,
             intent="medical",
             error=None,
+            patient_id="P-0001",
+            patient_context_used=True,
+            kb_sources=["medquad.txt"],
+            patient_source="patient_record:P-0001",
         )
 
     records = [json.loads(line) for line in audit_path.read_text().splitlines() if line]
@@ -41,6 +45,10 @@ def test_log_interaction_writes_required_fields(tmp_path):
     assert rec["model_response"] == "Oncology is the study of cancer."
     assert rec["guardrail_triggered"] is False
     assert rec["intent"] == "medical"
+    assert rec["patient_id"] == "P-0001"
+    assert rec["patient_context_used"] is True
+    assert rec["kb_sources"] == ["medquad.txt"]
+    assert rec["patient_source"] == "patient_record:P-0001"
 
 
 def test_log_interaction_guardrail_triggered(tmp_path):

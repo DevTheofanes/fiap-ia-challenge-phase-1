@@ -1,0 +1,30 @@
+{
+  "patient_id": "P-0002",
+  "demographics": {
+    "age": 47,
+    "sex": "female"
+  },
+  "chief_complaint": "Follow-up after benign breast biopsy",
+  "history": {
+    "personal_history": ["fibrocystic breast changes"],
+    "family_history": [],
+    "comorbidities": ["type 2 diabetes"]
+  },
+  "current_medications": ["metformin 850 mg twice daily"],
+  "recent_exams": {
+    "pathology": "benign fibroadenoma",
+    "ultrasound": "stable oval circumscribed lesion"
+  },
+  "recent_labs": {
+    "cbc": "within normal limits",
+    "hba1c": "7.1%"
+  },
+  "imaging_summary": "Stable benign-appearing lesion without suspicious interval change",
+  "clinician_notes": "Patient is anxious about recurrence and asks about routine follow-up imaging.",
+  "ml_context": {
+    "malignancy_probability": 0.12,
+    "model_label": "Benign",
+    "model_name": "RF"
+  },
+  "last_updated": "2026-03-23"
+}

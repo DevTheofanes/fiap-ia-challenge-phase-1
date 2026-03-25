@@ -1,62 +1,41 @@
-"""LangChain LCEL chain for the medical assistant (M3).
-
-Combines the retriever with ChatGoogleGenerativeAI to generate
-grounded responses from retrieved context.
-"""
+"""Prompt and context helpers for the medical assistant."""
 from __future__ import annotations
 
-from operator import itemgetter
-
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableLambda, RunnableParallel
+from langchain_core.documents import Document
 
 
-_PROMPT_TEMPLATE = ChatPromptTemplate.from_template(
-    """You are a medical assistant helping doctors with clinical questions about oncology.
-Use ONLY the retrieved knowledge below to answer. If the context does not contain \
-enough information to answer, say so clearly. Never prescribe medications or make \
-definitive diagnoses — always recommend consulting a qualified physician.
+def format_kb_context(docs: list[Document]) -> str:
+    """Render KB excerpts into a prompt-friendly block."""
+    if not docs:
+        return "No relevant knowledge base context found."
 
-{ml_context_block}
-Retrieved Knowledge:
-{context}
-
-Question: {question}
-
-Answer in the same language as the question. Be concise and cite relevant details \
-from the retrieved context."""
-)
+    blocks = []
+    for idx, doc in enumerate(docs, start=1):
+        source = doc.metadata.get("source", "unknown")
+        blocks.append(f"[KB-{idx}] source={source}\n{doc.page_content.strip()}")
+    return "\n\n".join(blocks)
 
 
-def _format_docs(docs) -> str:
-    return "\n\n".join(doc.page_content for doc in docs)
-
-
-def _format_ml_context(ml_context: str) -> str:
-    if not ml_context:
-        return ""
-    return f"ML Pipeline Context:\n{ml_context}\n"
-
-
-def build_chain(retriever, llm):
-    """Build a RAG chain that accepts a dict input.
-
-    Input schema: {"question": str, "ml_context": str | None}
-    Output: str (the generated answer)
-
-    None → "" coercion for ml_context happens inside this function.
-    """
-    chain = (
-        RunnableParallel(
-            context=(itemgetter("question") | retriever | _format_docs),
-            question=itemgetter("question"),
-            ml_context_block=RunnableLambda(
-                lambda x: _format_ml_context(x.get("ml_context") or "")
-            ),
-        )
-        | _PROMPT_TEMPLATE
-        | llm
-        | StrOutputParser()
+def build_generation_prompt(
+    *,
+    question: str,
+    patient_context: str,
+    kb_context: str,
+) -> str:
+    """Build the final generation prompt for the local assistant model."""
+    return (
+        "You are a medical oncology assistant helping doctors.\n"
+        "Use the provided Patient Context and Knowledge Base Context only.\n"
+        "Do not prescribe medication.\n"
+        "Do not make definitive diagnoses.\n"
+        "If information is insufficient, say so clearly.\n"
+        "Answer in the same language as the question.\n"
+        "Do not fabricate sources.\n\n"
+        "Patient Context\n"
+        f"{patient_context}\n\n"
+        "Knowledge Base Context\n"
+        f"{kb_context}\n\n"
+        "Question\n"
+        f"{question}\n\n"
+        "Answer:"
     )
-    return chain

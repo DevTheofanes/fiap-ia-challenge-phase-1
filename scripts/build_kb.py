@@ -12,6 +12,7 @@ from __future__ import annotations
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 from src.assistant.retriever import build_vectorstore
 from src.config import KB_DIR, LOGS_DIR, MEDQUAD_DIR, VECTORSTORE_DIR

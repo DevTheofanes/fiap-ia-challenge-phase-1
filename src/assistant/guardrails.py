@@ -24,6 +24,11 @@ _PRESCRIPTION_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
+_TREATMENT_PATTERNS = re.compile(
+    r"\b(start|take|use|prescribe|administer)\b.{0,40}\b(mg|tablet|capsule|dose|daily|twice daily)\b",
+    re.IGNORECASE,
+)
+
 _DEFINITIVE_DIAGNOSIS_PATTERNS = [
     (
         re.compile(r"\byou have (cancer|tumor|malignancy|carcinoma)\b", re.IGNORECASE),
@@ -47,6 +52,11 @@ _INPUT_REFUSAL = (
 _PRESCRIPTION_REFUSAL = (
     "Não posso prescrever medicamentos ou tratamentos diretamente. "
     "Por favor, consulte um médico qualificado para orientação de tratamento."
+)
+
+_INSUFFICIENT_CONTEXT = (
+    "Não há contexto suficiente nos registros do paciente e na base de conhecimento "
+    "para responder com segurança."
 )
 
 
@@ -75,12 +85,30 @@ def has_definitive_diagnosis(response: str) -> bool:
     return any(pattern.search(response) for pattern, _ in _DEFINITIVE_DIAGNOSIS_PATTERNS)
 
 
-def filter_output(response: str) -> str:
-    """Appends disclaimer if absent; softens definitive diagnosis phrasing."""
+def _soften_treatment_language(response: str) -> str:
+    if _TREATMENT_PATTERNS.search(response):
+        return _PRESCRIPTION_REFUSAL
+    return response
+
+
+def has_guardrail_signal(original_response: str, filtered_response: str) -> bool:
+    if not isinstance(original_response, str) or not isinstance(filtered_response, str):
+        return True
+    return original_response.strip() != filtered_response.strip()
+
+
+def filter_output(response: str, *, has_context: bool) -> str:
+    """Return a guarded response with insufficiency handling and one disclaimer."""
     if not isinstance(response, str):
         return _DISCLAIMER.lstrip()
+
+    if not has_context:
+        response = _INSUFFICIENT_CONTEXT
+
     for pattern, replacement in _DEFINITIVE_DIAGNOSIS_PATTERNS:
         response = pattern.sub(replacement, response)
+
+    response = _soften_treatment_language(response)
 
     if _DISCLAIMER not in response:
         response += _DISCLAIMER

@@ -1,0 +1,30 @@
+{
+  "patient_id": "P-0001",
+  "demographics": {
+    "age": 54,
+    "sex": "female"
+  },
+  "chief_complaint": "Palpable breast lump in left breast",
+  "history": {
+    "personal_history": ["dense breasts"],
+    "family_history": ["mother with breast cancer at 62"],
+    "comorbidities": ["hypertension"]
+  },
+  "current_medications": ["losartan 50 mg daily"],
+  "recent_exams": {
+    "mammography": "BI-RADS 4 lesion in left breast",
+    "ultrasound": "solid irregular hypoechoic nodule, 1.8 cm"
+  },
+  "recent_labs": {
+    "cbc": "within normal limits",
+    "cmp": "within normal limits"
+  },
+  "imaging_summary": "Suspicious left breast lesion with recommendation for tissue diagnosis",
+  "clinician_notes": "Patient reports lump noticed 3 weeks ago; no fever; mild local tenderness.",
+  "ml_context": {
+    "malignancy_probability": 0.81,
+    "model_label": "Malignant",
+    "model_name": "RF"
+  },
+  "last_updated": "2026-03-23"
+}

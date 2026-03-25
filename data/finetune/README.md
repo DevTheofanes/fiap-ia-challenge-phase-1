@@ -4,6 +4,8 @@
 
 This directory contains instruction-tuning pairs for oncology LLM fine-tuning, produced by `scripts/prepare_finetune_data.py`.
 
+Important: the repository uses public and synthetic data to simulate the challenge requirement for internal hospital medical data. It does not contain real hospital PHI.
+
 ## Files
 
 | File | Description |

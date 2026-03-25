@@ -1,240 +1,238 @@
-# FIAP IA Challenge Phase 1 – Breast Cancer Diagnosis Pipeline
+# FIAP IA Tech Challenge — Phase 3 Medical Assistant
 
-Este repositório contém a solução desenvolvida para o Tech Challenge (Fase 1) da FIAP, focado
-na construção de um pipeline de aprendizado de máquina para diagnóstico do câncer de mama a
-partir do conjunto de dados de Wisconsin Breast Cancer.
+This repository contains the full project evolution for the FIAP Tech Challenge, ending in a Phase 3 medical assistant that combines:
 
-## Visão geral
+- Breast-cancer ML artifacts from earlier phases
+- Fine-tuning of a TinyLlama-based local model
+- LangGraph orchestration
+- KB retrieval over medical documents
+- Structured synthetic patient records
+- Guardrails, citations, and audit logging
 
-O script principal (`src/main.py`) executa um fluxo completo de experimentação:
+## Phase 3 Architecture
 
-1. **Carregamento e exploração dos dados** – inspeção de formato, estatísticas básicas e
-   distribuição da variável alvo.
-2. **Pré-processamento** – limpeza de identificadores, tratamento de valores ausentes e
-   padronização.
-3. **Treinamento e avaliação** – comparação de modelos clássicos de classificação com
-   validação cruzada, ajuste de hiperparâmetros e seleção baseada em desempenho no conjunto
-   de validação.
-4. **Métricas avançadas** – geração de curvas ROC/PR, matriz de confusão, curva de
-   aprendizado, calibração e análise de limiar.
-5. **Explicabilidade** – cálculo opcional de importâncias por SHAP (quando disponível) e
-   permutation importance como fallback.
-6. **Persistência** – salvamento do melhor modelo, lista de features e limiar ótimo em um
-   arquivo `best_model_with_threshold.joblib`.
-
-Todos os gráficos são renderizados utilizando o backend `Agg` do Matplotlib, o que permite a
-execução em ambientes headless (como containers Docker) sem dependências gráficas extras.
-
-## Estrutura do projeto
-
+```mermaid
+flowchart LR
+  A[classify_intent] -->|medical| B[retrieve_kb_context]
+  B --> C[retrieve_patient_context]
+  C --> D[generate_response]
+  D --> E[validate_response]
+  A -->|out_of_scope| F[refuse_response]
 ```
+
+Runtime policy:
+
+- Primary assistant model: fine-tuned TinyLlama adapter
+- Gemini: optional fallback only
+- Default fallback behavior: disabled
+
+## Project Structure
+
+```text
 .
-├── data/                          # Arquivos de dados brutos
-├── notebooks/                     # Explorações e estudos em Jupyter
+├── artifacts/
+│   ├── finetune_checkpoints/
+│   ├── logs/
+│   └── vectorstore/
+├── data/
+│   ├── finetune/
+│   ├── kb/
+│   ├── patients/
+│   └── wisconsin_breast_cancer.csv
+├── docs/
+│   ├── reports/
+│   └── requirements/
+├── scripts/
+│   ├── prepare_finetune_data.py
+│   ├── fine_tune.py
+│   ├── eval_finetune.py
+│   ├── build_kb.py
+│   └── run_assistant.py
 ├── src/
-│   └── main.py                    # Pipeline completo de treinamento
-│   └── genetic/                   # Espaço de busca e codificação genética
-├── requirements.txt               # Dependências Python
-├── Dockerfile                     # Imagem para execução containerizada
-└── README.md
+│   ├── assistant/
+│   ├── llm/
+│   ├── models/
+│   └── genetic/
+└── tests/
 ```
 
-## Pré-requisitos
+## Environment Setup
 
-- Python 3.10 ou superior.
-- Dependências listadas em `requirements.txt`.
-- Arquivo de dados `wisconsin_breast_cancer.csv` disponível em `data/`.
+1. Create and activate a virtual environment:
 
-Dependências opcionais:
-
-- `shap` e `xgboost` habilitam cálculos adicionais de interpretabilidade e um algoritmo extra
-  durante o treinamento. Caso não estejam instalados, o pipeline continua funcional, apenas
-  pulando essas etapas.
-
-## Instalação e execução local
-
-1. Crie e ative um ambiente virtual (opcional, porém recomendado):
-
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # Linux/macOS
-   .venv\Scripts\activate     # Windows PowerShell
-   ```
-
-2. Instale as dependências:
-
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-3. (Opcional) instale dependências extras para interpretabilidade:
-
-   ```bash
-   pip install shap xgboost
-   ```
-
-4. Execute o pipeline:
-
-   ```bash
-   python src/main.py
-   ```
-
-Os resultados numéricos são impressos no terminal. Gráficos são exibidos em modo não
-interativo; para salvá-los, configure `matplotlib` conforme necessário no próprio script.
-
-## Execução com Docker
-
-1. Construa a imagem:
-
-   ```bash
-   docker build -t fiap-ia-challenge .
-   ```
-
-2. Execute o container:
-
-   ```bash
-   docker run --rm -v "$(pwd)/data:/app/data" fiap-ia-challenge
-   ```
-
-   O volume garante que o dataset local seja montado dentro do container. Ao final da
-   execução o arquivo `best_model_with_threshold.joblib` ficará disponível dentro do
-   container em `/app`; mapeie um volume adicional caso queira persistir o artefato no host.
-
-## Relatório técnico
-
-Detalhes completos sobre escolhas de modelagem e resultados podem ser encontrados em
-[`Relatorio_Tecnico_Tech_Challenge_Fase1.md`](docs/reports/Relatorio_Tecnico_Tech_Challenge_Fase1.md).
-
-## Genome design & constraints
-
-- Modelos alvo: `LR` (Logistic Regression) e `RF` (Random Forest), otimizados separadamente.
-- Métrica fitness: `f1` (definida em `src/config.py`); avaliação recomendada com
-  `StratifiedKFold` de 3 folds no conjunto de treino.
-- Espaço de busca: definido em `src/genetic/search_space.py`.
-- Codificação: funções `random_individual`, `mutate`, `crossover`, `decode`, `repair` em
-  `src/genetic/encoding.py` (genes contínuos, discretos e categóricos).
-- Restrições tratadas no `repair()`:
-  - `penalty`/`solver` válidos em Logistic Regression.
-  - `min_samples_split > min_samples_leaf` e `criterion` suportado em Random Forest.
-
-## Integração com LLM para interpretação
-
-Adiciona uma camada de LLM ao pipeline para explicar diagnósticos e resumir resultados
-de experimentos em linguagem natural, com saída estruturada em JSON e fallback templateado.
-
-### Principais recursos
-
-- **Contrato de entrada/saída** para explicações clínicas e resumos de métricas.
-- **Prompts versionados** em `src/llm/prompts.py`.
-- **Validação do JSON** (schemas) em `src/llm/schemas.py`.
-- **Logging** de prompts e respostas em `artifacts/llm/llm_logs.jsonl` (com redaction).
-- **Fallback** quando a LLM não estiver configurada.
-
-### Estrutura adicionada
-
-```
-src/llm/
-  client.py          # Cliente Gemini (ou mock) e carregamento de .env
-  prompts.py         # Templates dos prompts
-  schemas.py         # Parsers e validação de JSON
-  explain.py         # Geração de explicação por amostra
-  summarize.py       # Resumo de métricas/experimentos
-scripts/
-  explain_sample.py  # Roda explicação em 1 amostra
-  summarize_results.py # Resume baseline vs GA
-artifacts/llm/
-  sample_explanations.jsonl
-  experiment_summaries.md
-docs/ai/
-  llm_eval.md        # Rubrica de avaliação manual
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### Configuração do Gemini
+2. Install dependencies:
 
-1. Copie/ajuste o arquivo `.env` com sua chave:
-
-   ```bash
-   GEMINI_API_KEY=...
-   GEMINI_MODEL=gemini-1.5-flash
-   ```
-
-2. Instale a dependência:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-Se a chave não estiver definida, o pipeline gera respostas templateadas automaticamente.
-
-### Exemplos de uso
-
-- Explicar uma amostra (salva JSONL e log):
-
-  ```bash
-  python scripts/explain_sample.py --split val --sample-idx 0
-  ```
-
-- Resumir baseline vs GA (gera `artifacts/llm/experiment_summaries.md`):
-
-  ```bash
-  python scripts/summarize_results.py
-  ```
-
-### Avaliação de qualidade (rubrica)
-
-Preencha a tabela em `docs/ai/llm_eval.md` com 10 amostras, avaliando clareza, coerência,
-não-alarmismo, utilidade clínica e conformidade.
-
-## Monitoramento, Logging e Escalabilidade
-
-### Logging estruturado
-Os logs ficam em `artifacts/logs/` no formato JSONL, com uma linha por evento. Campos
-chave incluem timestamp, stage, model, experiment, seed, metricas finais e tempo de execucao.
-
-Arquivos gerados:
-- `training.jsonl` (baseline e GA)
-- `evaluation.jsonl` (metricas por split)
-- `llm.jsonl` (eventos de explicabilidade)
-
-Exemplo de linha:
-```
-{"timestamp":"2026-01-20T18:42:10+00:00","level":"INFO","message":"ga_train","stage":"ga_train","model":"RF","experiment":"expB","seed":42,"best_f1":0.94,"duration_sec":312.5}
+```bash
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
 ```
 
-### Tracking de experimentos (manual)
-Cada experimento gera:
-- `history.csv` com convergencia do GA
-- `best.json` com melhor individuo e metricas
-- `best_model.joblib`
-Os agregados ficam em `artifacts/ga_summary/*.csv` via `scripts/summarize_ga_runs.py`.
+3. Optional `.env` settings:
 
-### Monitoramento de performance
-Os logs de treinamento registram:
-- tempo total por experimento
-- tempo medio por geracao (`mean_gen_time_sec`)
-- numero de avaliacoes (`eval_count`)
-- tempo medio por avaliacao (`mean_eval_time_sec`)
-Esses dados alimentam a discussao de custo computacional.
-
-### Preparacao para escalabilidade (conceitual)
-- Avaliacao de fitness e independente, podendo ser paralelizada com `multiprocessing` ou `joblib`.
-- Seeds/experimentos rodam como jobs isolados, permitindo escala horizontal.
-- Docker garante reprodutibilidade e isolamento do ambiente.
-
-### Arquitetura (diagrama simples)
-```
-Dataset
-  -> Data Loader
-    -> Preprocessing
-      -> Baseline Models
-      -> GA Optimizer
-        -> Best Model
-          -> Evaluation
-            -> LLM Interpreter
-              -> Artifacts/Logs
+```bash
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.0-flash
+ASSISTANT_ALLOW_FALLBACK=false
 ```
 
-## Contato
+## Fine-Tuning Workflow
 
-Dúvidas ou sugestões podem ser direcionadas via issues neste repositório.
+Prepare the instruction dataset:
+
+```bash
+python3 scripts/prepare_finetune_data.py --total 625 --seed 42
+```
+
+Train the LoRA adapter:
+
+```bash
+python3 scripts/fine_tune.py --epochs 1 --batch-size 2
+```
+
+Evaluate base vs fine-tuned model:
+
+```bash
+python3 scripts/eval_finetune.py --split val --num-samples 10
+```
+
+Artifacts:
+
+- Adapter: `artifacts/finetune_checkpoints/final_adapter/`
+- Logs: `artifacts/logs/finetune.jsonl`
+
+## Knowledge Base Build
+
+Build the KB text files and Chroma vector store:
+
+```bash
+python3 scripts/build_kb.py
+```
+
+Artifacts:
+
+- KB documents: `data/kb/`
+- Vector store: `artifacts/vectorstore/`
+
+## Structured Patient Records
+
+Synthetic structured records live in `data/patients/`.
+
+Each file uses this schema:
+
+```json
+{
+  "patient_id": "P-0001",
+  "demographics": {"age": 54, "sex": "female"},
+  "chief_complaint": "Palpable breast lump in left breast",
+  "history": {
+    "personal_history": ["dense breasts"],
+    "family_history": ["mother with breast cancer at 62"],
+    "comorbidities": ["hypertension"]
+  },
+  "current_medications": ["losartan 50 mg daily"],
+  "recent_exams": {
+    "mammography": "BI-RADS 4 lesion in left breast",
+    "ultrasound": "solid irregular hypoechoic nodule, 1.8 cm"
+  },
+  "recent_labs": {"cbc": "within normal limits", "cmp": "within normal limits"},
+  "imaging_summary": "Suspicious left breast lesion with recommendation for tissue diagnosis",
+  "clinician_notes": "Patient reports lump noticed 3 weeks ago; no fever; mild local tenderness.",
+  "ml_context": {
+    "malignancy_probability": 0.81,
+    "model_label": "Malignant",
+    "model_name": "RF"
+  },
+  "last_updated": "2026-03-23"
+}
+```
+
+## Run the Assistant
+
+KB-only mode:
+
+```bash
+python3 scripts/run_assistant.py
+```
+
+Patient-context mode:
+
+```bash
+python3 scripts/run_assistant.py --patient-id P-0001
+```
+
+Legacy ML-context mode without patient record:
+
+```bash
+python3 scripts/run_assistant.py --features "17.99,10.38,122.8,1001,..."
+```
+
+Expected behavior:
+
+- The assistant uses the local fine-tuned adapter by default.
+- If `ASSISTANT_ALLOW_FALLBACK=false`, adapter load failure returns an error instead of silently switching models.
+- If `ASSISTANT_ALLOW_FALLBACK=true`, Gemini may be used only when the local model cannot initialize.
+- Final answers include:
+  - `Clinical Context Source: patient_record:<id>` when patient context is used
+  - `Knowledge Base Sources: ...` when KB docs are used
+
+## Testing
+
+Run the test suite:
+
+```bash
+python3 -m pytest -q
+```
+
+Recommended smoke checks:
+
+```bash
+python3 -m pytest -q tests/test_guardrails.py tests/test_patient_store.py tests/test_audit_logger.py
+python3 -m pytest -q tests/test_assistant_graph.py
+```
+
+## Logging and Audit
+
+Structured logs are written to `artifacts/logs/`.
+
+Key files:
+
+- `artifacts/logs/finetune.jsonl`
+- `artifacts/logs/assistant.jsonl`
+- `artifacts/logs/audit.jsonl`
+
+Audit entries include:
+
+- `user_query`
+- `retrieved_docs`
+- `model_response`
+- `guardrail_triggered`
+- `patient_id`
+- `patient_context_used`
+- `kb_sources`
+- `patient_source`
+
+## Data Provenance
+
+Phase 3 uses public and synthetic data to simulate the challenge requirement for internal medical data:
+
+- MedQuAD
+- PubMedQA
+- Synthetic oncology instruction pairs
+- Synthetic structured patient records
+
+This repository does not contain real hospital PHI.
+
+## Report and Demo
+
+Phase 3 report:
+
+- [Relatorio_Tecnico_Tech_Challenge_Fase3.md](/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/docs/reports/Relatorio_Tecnico_Tech_Challenge_Fase3.md)
+
+Demo/video placeholder:
+
+- Add the final submission video link here before delivery.
