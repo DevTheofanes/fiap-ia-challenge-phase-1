@@ -45,10 +45,10 @@ Rationale: surgical changes with zero logic impact. The logging suppression is s
 
 Add to the Phase 3 section:
 ```
-langchain-chroma>=0.1.0,<2.0.0
+langchain-chroma>=0.2.0,<2.0.0  # >=0.2.0 required for Python 3.14 compat
 ```
 
-The existing `chromadb` entry remains — `langchain-chroma` wraps it. Upper bound is `<2.0.0`, consistent with the project's pinning convention for Phase 3 dependencies.
+The existing `chromadb` entry remains — `langchain-chroma` wraps it. Upper bound is `<2.0.0`, consistent with the project's pinning convention for Phase 3 dependencies. Lower bound is `0.2.0` (not `0.1.0`) because `langchain-chroma` 0.1.x is incompatible with Python 3.14+.
 
 ## Out of Scope
 
