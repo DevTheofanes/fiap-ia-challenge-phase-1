@@ -5,10 +5,11 @@ relevant context for user queries.
 """
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
+from langchain_chroma import Chroma
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
-from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -19,6 +20,8 @@ _CHUNK_OVERLAP = 64
 
 
 def _get_embeddings() -> HuggingFaceEmbeddings:
+    # Suppress harmless checkpoint key mismatch log from transformers/BertModel
+    logging.getLogger("transformers.modeling_utils").setLevel(logging.ERROR)
     return HuggingFaceEmbeddings(model_name=_EMBEDDING_MODEL)
 
 
