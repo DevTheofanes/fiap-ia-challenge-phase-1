@@ -132,7 +132,7 @@ def train_yolo(
             imgsz=imgsz,
             batch=batch,
             project=str(project_path),
-            name=name,
+            run_name=name,
             device=device,
         )
 

@@ -75,10 +75,10 @@
 
 ## M8 — Relatório técnico e entregáveis
 
-- [ ] Criar `docs/reports/Relatorio_Tecnico_Tech_Challenge_Fase4.md` com:
-  - [ ] Descrição do fluxo multimodal
-  - [ ] Modelos aplicados por modalidade
-  - [ ] Resultados e exemplos de anomalias detectadas
-  - [ ] Métricas do YOLOv8 (mAP, precision, recall)
-- [ ] Atualizar `README.md` com instruções da Fase 4
-- [ ] Gravar vídeo de demonstração (máx. 15 min) e adicionar link no README
+- [x] Criar `docs/reports/Relatorio_Tecnico_Tech_Challenge_Fase4.md` com:
+  - [x] Descrição do fluxo multimodal
+  - [x] Modelos aplicados por modalidade
+  - [x] Resultados e exemplos de anomalias detectadas
+  - [x] Métricas do YOLOv8 (mAP, precision, recall)
+- [x] Atualizar `README.md` com instruções da Fase 4
+- [ ] Gravar vídeo de demonstração (máx. 15 min) e substituir o placeholder no README pelo link final

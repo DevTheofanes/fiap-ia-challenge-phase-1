@@ -1,0 +1,5 @@
+path: /Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/data/synthetic_bleeding
+train: images/train
+val: images/val
+nc: 1
+names: ['anomalous_bleeding']

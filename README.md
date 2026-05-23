@@ -1,6 +1,6 @@
-# FIAP IA Tech Challenge — Phase 3 Medical Assistant
+# FIAP IA Tech Challenge - Phase 4 Multimodal Medical Assistant
 
-This repository contains the full project evolution for the FIAP Tech Challenge, ending in a Phase 3 medical assistant that combines:
+This repository contains the full project evolution for the FIAP Tech Challenge, ending in a Phase 4 multimodal medical assistant that combines:
 
 - Breast-cancer ML artifacts from earlier phases
 - Fine-tuning of a TinyLlama-based local model
@@ -8,16 +8,20 @@ This repository contains the full project evolution for the FIAP Tech Challenge,
 - KB retrieval over medical documents
 - Structured synthetic patient records
 - Guardrails, citations, and audit logging
+- Audio transcription and clinical transcript analysis
+- YOLOv8 video screening for anomalous bleeding
 
-## Phase 3 Architecture
+## Phase 4 Architecture
 
 ```mermaid
 flowchart LR
   A[classify_intent] -->|medical| B[retrieve_kb_context]
   B --> C[retrieve_patient_context]
-  C --> D[generate_response]
-  D --> E[validate_response]
-  A -->|out_of_scope| F[refuse_response]
+  C --> D[process_audio]
+  D --> E[process_video]
+  E --> F[generate_response]
+  F --> G[validate_response]
+  A -->|out_of_scope| H[refuse_response]
 ```
 
 Runtime policy:
@@ -25,6 +29,9 @@ Runtime policy:
 - Primary assistant model: fine-tuned TinyLlama adapter
 - Gemini: optional fallback only
 - Default fallback behavior: disabled
+- Audio transcription: OpenAI Whisper API
+- Audio clinical analysis: GPT-4o-mini through `OpenAIClient`
+- Video detection: YOLOv8 fine-tuned on synthetic `anomalous_bleeding` frames
 
 ## Project Structure
 
@@ -33,25 +40,32 @@ Runtime policy:
 ├── artifacts/
 │   ├── finetune_checkpoints/
 │   ├── logs/
+│   ├── yolo/
 │   └── vectorstore/
 ├── data/
 │   ├── finetune/
 │   ├── kb/
 │   ├── patients/
+│   ├── synthetic_bleeding/
 │   └── wisconsin_breast_cancer.csv
 ├── docs/
 │   ├── reports/
 │   └── requirements/
 ├── scripts/
-│   ├── prepare_finetune_data.py
-│   ├── fine_tune.py
-│   ├── eval_finetune.py
+│   ├── analyze_audio.py
+│   ├── analyze_video.py
 │   ├── build_kb.py
-│   └── run_assistant.py
+│   ├── eval_finetune.py
+│   ├── fine_tune.py
+│   ├── generate_synthetic_data.py
+│   ├── prepare_finetune_data.py
+│   ├── run_assistant.py
+│   └── train_yolo.py
 ├── src/
 │   ├── assistant/
 │   ├── llm/
 │   ├── models/
+│   ├── multimodal/
 │   └── genetic/
 └── tests/
 ```
@@ -75,9 +89,12 @@ python3 -m pip install -r requirements.txt
 3. Optional `.env` settings:
 
 ```bash
+OPENAI_API_KEY=...
+OPENAI_MODEL=gpt-4o-mini
 GEMINI_API_KEY=...
 GEMINI_MODEL=gemini-2.0-flash
 ASSISTANT_ALLOW_FALLBACK=false
+LLM_USE_MOCK=false
 ```
 
 ## Fine-Tuning Workflow
@@ -104,6 +121,57 @@ Artifacts:
 
 - Adapter: `artifacts/finetune_checkpoints/final_adapter/`
 - Logs: `artifacts/logs/finetune.jsonl`
+
+## Phase 4 Audio Workflow
+
+Analyze a consultation audio file:
+
+```bash
+python3 scripts/analyze_audio.py path/to/consultation.wav
+```
+
+Pipeline:
+
+- `transcribe(audio_path)` calls the OpenAI transcription API with `whisper-1`.
+- `analyze_transcript(transcript)` generates a structured clinical screening report with GPT-4o-mini.
+- The report covers postpartum depression, anxiety, possible violence or unsafe conditions, and hormonal fatigue or sleep deprivation.
+
+## Phase 4 Video Workflow
+
+Generate the synthetic YOLOv8 dataset:
+
+```bash
+python3 scripts/generate_synthetic_data.py
+```
+
+Train YOLOv8:
+
+```bash
+python3 scripts/train_yolo.py --device mps
+```
+
+Use `--device cpu` if MPS or CUDA is unavailable.
+
+Analyze a clinical video:
+
+```bash
+python3 scripts/analyze_video.py path/to/procedure.mp4 \
+  --model-path artifacts/yolo/bleeding_yolov8n/weights/best.pt
+```
+
+Generated artifacts:
+
+- Synthetic dataset: `data/synthetic_bleeding/`
+- YOLO model: `artifacts/yolo/bleeding_yolov8n/weights/best.pt`
+- YOLO training log: `artifacts/logs/yolo_training.jsonl`
+
+Latest local YOLOv8 validation metrics on the synthetic validation split:
+
+| Metric | Value |
+| --- | ---: |
+| mAP50 | 0.9950 |
+| Precision | 0.9984 |
+| Recall | 1.0000 |
 
 ## Knowledge Base Build
 
@@ -165,6 +233,15 @@ Patient-context mode:
 python3 scripts/run_assistant.py --patient-id P-0001
 ```
 
+Multimodal mode:
+
+```bash
+python3 scripts/run_assistant.py \
+  --patient-id P-0001 \
+  --audio path/to/consultation.wav \
+  --video path/to/procedure.mp4
+```
+
 Legacy ML-context mode without patient record:
 
 ```bash
@@ -179,6 +256,8 @@ Expected behavior:
 - Final answers include:
   - `Clinical Context Source: patient_record:<id>` when patient context is used
   - `Knowledge Base Sources: ...` when KB docs are used
+  - `Audio Source: ...` when audio context is used
+  - `Video Source: ...` when video context is used
 
 ## Testing
 
@@ -193,6 +272,7 @@ Recommended smoke checks:
 ```bash
 python3 -m pytest -q tests/test_guardrails.py tests/test_patient_store.py tests/test_audit_logger.py
 python3 -m pytest -q tests/test_assistant_graph.py
+python3 scripts/generate_synthetic_data.py --count 10 --output-dir /tmp/synthetic_bleeding_smoke
 ```
 
 ## Logging and Audit
@@ -204,6 +284,7 @@ Key files:
 - `artifacts/logs/finetune.jsonl`
 - `artifacts/logs/assistant.jsonl`
 - `artifacts/logs/audit.jsonl`
+- `artifacts/logs/yolo_training.jsonl`
 
 Audit entries include:
 
@@ -218,12 +299,13 @@ Audit entries include:
 
 ## Data Provenance
 
-Phase 3 uses public and synthetic data to simulate the challenge requirement for internal medical data:
+Phase 4 uses public and synthetic data to simulate the challenge requirement for internal medical data:
 
 - MedQuAD
 - PubMedQA
 - Synthetic oncology instruction pairs
 - Synthetic structured patient records
+- Synthetic laparoscopic-style frames for anomalous bleeding detection
 
 This repository does not contain real hospital PHI.
 
@@ -233,6 +315,10 @@ Phase 3 report:
 
 - [Relatorio_Tecnico_Tech_Challenge_Fase3.md](/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/docs/reports/Relatorio_Tecnico_Tech_Challenge_Fase3.md)
 
-Demo/video placeholder:
+Phase 4 report:
 
-- Add the final submission video link here before delivery.
+- [Relatorio_Tecnico_Tech_Challenge_Fase4.md](/Users/theonetto/www/pos-ia-dev/fiap-ia-challenge-phase-2/docs/reports/Relatorio_Tecnico_Tech_Challenge_Fase4.md)
+
+Phase 4 demo video:
+
+- TODO: add final YouTube or Vimeo link before delivery.
