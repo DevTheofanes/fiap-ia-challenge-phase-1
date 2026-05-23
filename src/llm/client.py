@@ -103,6 +103,32 @@ class GeminiClient(LLMClient):
         return LLMResponse(text=text, raw=response, model=self.model, provider="gemini")
 
 
+class OpenAIClient(LLMClient):
+    def __init__(self, api_key: str, model: str) -> None:
+        self.api_key = api_key
+        self.model = model
+        self._client = None
+
+    def _init_client(self) -> Any:
+        try:
+            from openai import OpenAI  # type: ignore
+        except Exception as exc:  # pragma: no cover - optional dependency
+            raise RuntimeError("openai is not installed. Install it to use OpenAI.") from exc
+        self._client = OpenAI(api_key=self.api_key)
+        return self._client
+
+    def generate(self, prompt: str, *, temperature: float = 0.2, max_tokens: int = 512) -> LLMResponse:
+        client = self._client or self._init_client()
+        response = client.responses.create(
+            model=self.model,
+            input=prompt,
+            temperature=temperature,
+            max_output_tokens=max_tokens,
+        )
+        text = getattr(response, "output_text", None) or str(response)
+        return LLMResponse(text=text, raw=response, model=self.model, provider="openai")
+
+
 class MockClient(LLMClient):
     _call_counter: int = 0
 
@@ -140,8 +166,12 @@ def get_llm_client() -> LLMClient | None:
     use_mock = os.getenv("LLM_USE_MOCK", "false").lower() == "true"
     if use_mock:
         return MockClient()
-    api_key = os.getenv("GEMINI_API_KEY")
-    model = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
-    if not api_key:
-        return None
-    return GeminiClient(api_key=api_key, model=model)
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if openai_api_key:
+        openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        return OpenAIClient(api_key=openai_api_key, model=openai_model)
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    if gemini_api_key:
+        gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+        return GeminiClient(api_key=gemini_api_key, model=gemini_model)
+    return None

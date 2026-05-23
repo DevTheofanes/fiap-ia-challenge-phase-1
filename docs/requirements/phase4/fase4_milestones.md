@@ -15,9 +15,9 @@
 
 ## M1 — Novo cliente LLM (OpenAI)
 
-- [ ] Adicionar `OpenAIClient` em `src/llm/client.py` seguindo o padrão de `GeminiClient`
-- [ ] Adicionar `OPENAI_API_KEY` e `OPENAI_MODEL` ao `.env.example`
-- [ ] Estender `get_llm_client()` para retornar `OpenAIClient` quando `OPENAI_API_KEY` estiver definido
+- [x] Adicionar `OpenAIClient` em `src/llm/client.py` seguindo o padrão de `GeminiClient`
+- [x] Adicionar `OPENAI_API_KEY` e `OPENAI_MODEL` ao `.env.example`
+- [x] Estender `get_llm_client()` para retornar `OpenAIClient` quando `OPENAI_API_KEY` estiver definido
 
 ## M2 — Pipeline de áudio
 
