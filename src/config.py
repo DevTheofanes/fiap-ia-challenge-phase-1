@@ -48,3 +48,6 @@ PUBMEDQA_FILE         = EXTERNAL_DATA_DIR / "pubmedqa" / "data" / "ori_pqal.json
 MEDQUAD_DIR           = EXTERNAL_DATA_DIR / "medquad" / "1_CancerGov_QA"
 BEST_MODEL_PATH       = ARTIFACTS_DIR / "models" / "best_model_with_threshold.joblib"
 PATIENTS_DIR          = BASE_DIR / "data" / "patients"
+DEFAULT_YOLO_MODEL_PATH = (
+    ARTIFACTS_DIR / "yolo" / "bleeding_yolov8n" / "weights" / "best.pt"
+)

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -26,6 +29,7 @@ def _video_fps(video_path: Path) -> float | None:
     try:
         import cv2  # type: ignore
     except Exception:  # pragma: no cover - optional dependency
+        logger.warning("cv2 is not available; video timestamps will default to 0.0s.")
         return None
 
     capture = cv2.VideoCapture(str(video_path))

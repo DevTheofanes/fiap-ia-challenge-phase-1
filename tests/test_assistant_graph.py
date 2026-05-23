@@ -7,6 +7,7 @@ langchain_core = pytest.importorskip("langchain_core")
 
 from langchain_core.documents import Document
 
+from src.config import DEFAULT_YOLO_MODEL_PATH
 from src.assistant import graph as graph_mod
 from src.assistant.chain import build_generation_prompt
 
@@ -130,13 +131,15 @@ def test_graph_processes_audio_and_video_before_generation(fake_graph, monkeypat
     assert calls["audio_path"] == "sample.wav"
     assert calls["transcript"] == "transcript text"
     assert calls["video_path"] == "sample.mp4"
-    assert calls["model_path"] == graph_mod.DEFAULT_YOLO_MODEL_PATH
+    assert calls["model_path"] == DEFAULT_YOLO_MODEL_PATH
     assert calls["detections"] == ["detection"]
     assert result["audio_transcript"] == "transcript text"
     assert result["audio_analysis"] == "audio clinical report"
     assert result["video_report"] == "video clinical report"
     assert "Audio clinical analysis:\naudio clinical report" in _FakeLocalLLM.prompts[-1]
     assert "Video clinical report:\nvideo clinical report" in _FakeLocalLLM.prompts[-1]
+    assert "Audio Source: sample.wav" in result["answer"]
+    assert "Video Source: sample.mp4" in result["answer"]
 
 
 def test_build_generation_prompt_includes_multimodal_context():

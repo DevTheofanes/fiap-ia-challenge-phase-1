@@ -59,6 +59,24 @@ def test_analyze_video_requires_ultralytics(monkeypatch, tmp_path):
         video.analyze_video(video_path, model_path)
 
 
+def test_video_fps_warns_when_cv2_is_unavailable(monkeypatch, caplog, tmp_path):
+    monkeypatch.delitem(sys.modules, "cv2", raising=False)
+    real_import = builtins.__import__
+
+    def _fake_import(name, *args, **kwargs):
+        if name == "cv2":
+            raise ImportError("blocked")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _fake_import)
+
+    with caplog.at_level("WARNING", logger=video.__name__):
+        fps = video._video_fps(tmp_path / "sample.mp4")
+
+    assert fps is None
+    assert "cv2 is not available" in caplog.text
+
+
 def test_analyze_video_passes_options_and_filters_detections(monkeypatch, tmp_path):
     video_path = tmp_path / "sample.mp4"
     model_path = tmp_path / "best.pt"

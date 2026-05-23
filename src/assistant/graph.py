@@ -16,7 +16,7 @@ from src.assistant.local_llm import (
     allow_fallback,
 )
 from src.assistant.retriever import get_retriever
-from src.config import ASSISTANT_LOG_PATH, VECTORSTORE_DIR
+from src.config import ASSISTANT_LOG_PATH, DEFAULT_YOLO_MODEL_PATH, VECTORSTORE_DIR
 from src.llm.client import get_llm_client
 from src.logging_utils import log_event, setup_json_logger
 from src.multimodal.audio import analyze_transcript, transcribe
@@ -29,16 +29,6 @@ _CLASSIFY_PROMPT = (
     "Reply with ONLY the single word: medical OR out_of_scope.\n\n"
     "Question: {query}"
 )
-
-DEFAULT_YOLO_MODEL_PATH = (
-    Path(__file__).resolve().parents[2]
-    / "artifacts"
-    / "yolo"
-    / "bleeding_yolov8n"
-    / "weights"
-    / "best.pt"
-)
-
 
 class AssistantState(TypedDict):
     query: str
@@ -233,9 +223,11 @@ def build_graph():
             }
         )
         patient_source = state.get("patient_source") if state.get("used_patient_context") else None
+        audio_source = state.get("audio_path") if state.get("audio_path") else None
+        video_source = state.get("video_path") if state.get("video_path") else None
         answer = guardrails.filter_output(
             state["answer"],
-            has_context=bool(kb_sources or patient_source),
+            has_context=bool(kb_sources or patient_source or audio_source or video_source),
         )
         explanation = explainer.explain_prediction(
             query=state["query"],
@@ -250,6 +242,10 @@ def build_graph():
             answer += f"\n\nClinical Context Source: {patient_source}"
         if kb_sources:
             answer += f"\nKnowledge Base Sources: {', '.join(kb_sources)}"
+        if audio_source:
+            answer += f"\nAudio Source: {audio_source}"
+        if video_source:
+            answer += f"\nVideo Source: {video_source}"
 
         audit_logger.log_interaction(
             user_query=state["query"],
@@ -270,6 +266,8 @@ def build_graph():
             intent=state["intent"],
             kb_sources=kb_sources,
             patient_source=patient_source,
+            audio_source=audio_source,
+            video_source=video_source,
             answer_len=len(answer),
             refused=False,
         )
