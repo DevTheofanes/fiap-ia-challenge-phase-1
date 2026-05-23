@@ -21,12 +21,12 @@
 
 ## M2 — Pipeline de áudio
 
-- [ ] Criar `src/multimodal/__init__.py`
-- [ ] Criar `src/multimodal/audio.py`
-  - [ ] Função `transcribe(audio_path)` — chama Whisper API, retorna transcript
-  - [ ] Função `analyze_transcript(transcript, client)` — envia ao GPT-4o-mini, retorna laudo clínico estruturado
-  - [ ] Prompt clínico cobrindo: depressão pós-parto, ansiedade, sinais de violência, fadiga hormonal
-- [ ] Criar `scripts/analyze_audio.py` — CLI standalone para testar o pipeline
+- [x] Criar `src/multimodal/__init__.py`
+- [x] Criar `src/multimodal/audio.py`
+  - [x] Função `transcribe(audio_path)` — chama Whisper API, retorna transcript
+  - [x] Função `analyze_transcript(transcript, client)` — envia ao GPT-4o-mini, retorna laudo clínico estruturado
+  - [x] Prompt clínico cobrindo: depressão pós-parto, ansiedade, sinais de violência, fadiga hormonal
+- [x] Criar `scripts/analyze_audio.py` — CLI standalone para testar o pipeline
 
 ## M3 — Geração de dados sintéticos para YOLOv8
 
