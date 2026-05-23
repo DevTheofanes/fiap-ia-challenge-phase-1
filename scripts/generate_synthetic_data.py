@@ -130,9 +130,10 @@ def _write_png(path: Path, image: np.ndarray) -> None:
 def _write_dataset_yaml(output_dir: Path) -> None:
     content = "\n".join(
         [
-            f"path: {output_dir.as_posix()}",
+            f"path: {output_dir.resolve().as_posix()}",
             "train: images/train",
             "val: images/val",
+            "nc: 1",
             f"names: ['{CLASS_NAME}']",
             "",
         ]

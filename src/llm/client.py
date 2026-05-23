@@ -119,13 +119,13 @@ class OpenAIClient(LLMClient):
 
     def generate(self, prompt: str, *, temperature: float = 0.2, max_tokens: int = 512) -> LLMResponse:
         client = self._client or self._init_client()
-        response = client.responses.create(
+        response = client.chat.completions.create(
             model=self.model,
-            input=prompt,
+            messages=[{"role": "user", "content": prompt}],
             temperature=temperature,
-            max_output_tokens=max_tokens,
+            max_tokens=max_tokens,
         )
-        text = getattr(response, "output_text", None) or str(response)
+        text = response.choices[0].message.content or ""
         return LLMResponse(text=text, raw=response, model=self.model, provider="openai")
 
 
@@ -151,7 +151,7 @@ class MockClient(LLMClient):
         payload = {
             "summary_for_clinician": [
                 "Mock response: LLM disabled.",
-                "Check GEMINI_API_KEY to enable Gemini.",
+                "Set OPENAI_API_KEY or GEMINI_API_KEY to enable a real LLM.",
             ],
             "key_factors": ["mock_feature"],
             "recommended_next_steps": ["review case manually"],

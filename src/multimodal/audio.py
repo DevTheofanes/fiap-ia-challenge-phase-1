@@ -75,5 +75,5 @@ def analyze_transcript(transcript: str, client: LLMClient | None = None) -> str:
         )
 
     prompt = CLINICAL_AUDIO_PROMPT.format(transcript=cleaned_transcript)
-    response = llm_client.generate(prompt, temperature=0.1, max_tokens=900)
+    response = llm_client.generate(prompt, temperature=0.1, max_tokens=1500)
     return response.text.strip()
