@@ -18,9 +18,12 @@ O fluxo final preserva as etapas da Fase 3 e adiciona dois novos nos opcionais e
 flowchart LR
   A[classify_intent] -->|medical| B[retrieve_kb_context]
   B --> C[retrieve_patient_context]
-  C --> D[process_audio]
-  D --> E[process_video]
-  E --> F[generate_response]
+  C -->|ok| D[process_audio]
+  C -->|error| I[error_response]
+  D -->|ok| E[process_video]
+  D -->|error| I
+  E -->|ok| F[generate_response]
+  E -->|error| I
   F --> G[validate_response]
   A -->|out_of_scope| H[refuse_response]
 ```

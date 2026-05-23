@@ -165,7 +165,7 @@ def build_graph():
 
         try:
             transcript = transcribe(audio_path)
-            analysis = analyze_transcript(transcript)
+            analysis = analyze_transcript(transcript, classifier)
         except Exception as exc:
             return {
                 **state,
