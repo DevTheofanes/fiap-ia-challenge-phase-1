@@ -68,10 +68,10 @@
 
 ## M7 — Notebook de demonstração
 
-- [ ] Criar `notebooks/demo_phase4.ipynb` cobrindo:
-  - [ ] Demonstração do pipeline de áudio (áudio sintético → transcript → laudo)
-  - [ ] Demonstração do pipeline de vídeo (vídeo sintético → detecções → relatório)
-  - [ ] Fluxo integrado via LangGraph com áudio + vídeo + pergunta clínica
+- [x] Criar `notebooks/demo_phase4.ipynb` cobrindo:
+  - [x] Demonstração do pipeline de áudio (áudio sintético → transcript → laudo)
+  - [x] Demonstração do pipeline de vídeo (vídeo sintético → detecções → relatório)
+  - [x] Fluxo integrado via LangGraph com áudio + vídeo + pergunta clínica
 
 ## M8 — Relatório técnico e entregáveis
 
