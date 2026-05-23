@@ -54,17 +54,17 @@
 
 ## M6 — Integração com LangGraph
 
-- [ ] Estender `AssistantState` em `src/assistant/graph.py` com campos:
+- [x] Estender `AssistantState` em `src/assistant/graph.py` com campos:
   - `audio_path: str | None`
   - `audio_transcript: str | None`
   - `audio_analysis: str | None`
   - `video_path: str | None`
   - `video_report: str | None`
-- [ ] Adicionar nó `process_audio` — pula se `audio_path` for None
-- [ ] Adicionar nó `process_video` — pula se `video_path` for None
-- [ ] Inserir os novos nós entre `retrieve_patient_context` e `generate_response`
-- [ ] Estender `build_generation_prompt` em `src/assistant/chain.py` para incluir `audio_analysis` e `video_report` no contexto
-- [ ] Estender `scripts/run_assistant.py` com flags `--audio` e `--video`
+- [x] Adicionar nó `process_audio` — pula se `audio_path` for None
+- [x] Adicionar nó `process_video` — pula se `video_path` for None
+- [x] Inserir os novos nós entre `retrieve_patient_context` e `generate_response`
+- [x] Estender `build_generation_prompt` em `src/assistant/chain.py` para incluir `audio_analysis` e `video_report` no contexto
+- [x] Estender `scripts/run_assistant.py` com flags `--audio` e `--video`
 
 ## M7 — Notebook de demonstração
 

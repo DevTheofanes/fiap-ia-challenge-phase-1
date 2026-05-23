@@ -21,6 +21,8 @@ def build_generation_prompt(
     question: str,
     patient_context: str,
     kb_context: str,
+    audio_analysis: str | None = None,
+    video_report: str | None = None,
 ) -> str:
     """Build the generation prompt using the same format as fine-tuning training data."""
     context_parts: list[str] = []
@@ -32,6 +34,12 @@ def build_generation_prompt(
     _no_kb = "No relevant knowledge base context found."
     if kb_context and kb_context.strip() and kb_context.strip() != _no_kb:
         context_parts.append(f"Medical reference:\n{kb_context.strip()}")
+
+    if audio_analysis and audio_analysis.strip():
+        context_parts.append(f"Audio clinical analysis:\n{audio_analysis.strip()}")
+
+    if video_report and video_report.strip():
+        context_parts.append(f"Video clinical report:\n{video_report.strip()}")
 
     if context_parts:
         context_block = "\n\n".join(context_parts)

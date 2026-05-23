@@ -5,6 +5,7 @@ Usage:
     python scripts/run_assistant.py
     python scripts/run_assistant.py --features "17.99,10.38,122.8,1001,0.118,..."
     python scripts/run_assistant.py --patient-id P-0001
+    python scripts/run_assistant.py --audio consultation.wav --video procedure.mp4
 
 The --features flag accepts 30 comma-separated float values (Wisconsin dataset
 feature order) and injects an ML prediction into the assistant context when
@@ -73,6 +74,18 @@ def main() -> None:
         default=None,
         help="30 comma-separated Wisconsin feature values for ML prediction context",
     )
+    parser.add_argument(
+        "--audio",
+        type=str,
+        default=None,
+        help="Path to an audio file to transcribe and analyze before answering",
+    )
+    parser.add_argument(
+        "--video",
+        type=str,
+        default=None,
+        help="Path to a video file to analyze before answering",
+    )
     args = parser.parse_args()
 
     ml_context: str | None = None
@@ -109,6 +122,11 @@ def main() -> None:
             "used_patient_context": False,
             "refused": False,
             "error": None,
+            "audio_path": args.audio,
+            "audio_transcript": None,
+            "audio_analysis": None,
+            "video_path": args.video,
+            "video_report": None,
         }
 
         result = graph.invoke(state)

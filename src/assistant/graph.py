@@ -19,6 +19,8 @@ from src.assistant.retriever import get_retriever
 from src.config import ASSISTANT_LOG_PATH, VECTORSTORE_DIR
 from src.llm.client import get_llm_client
 from src.logging_utils import log_event, setup_json_logger
+from src.multimodal.audio import analyze_transcript, transcribe
+from src.multimodal.video import analyze_video, generate_video_report
 
 _CLASSIFY_PROMPT = (
     "Classify the following question as either 'medical' (related to medicine, "
@@ -26,6 +28,15 @@ _CLASSIFY_PROMPT = (
     "or 'out_of_scope' (anything else).\n"
     "Reply with ONLY the single word: medical OR out_of_scope.\n\n"
     "Question: {query}"
+)
+
+DEFAULT_YOLO_MODEL_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "artifacts"
+    / "yolo"
+    / "bleeding_yolov8n"
+    / "weights"
+    / "best.pt"
 )
 
 
@@ -43,6 +54,11 @@ class AssistantState(TypedDict):
     used_patient_context: bool
     refused: bool
     error: str | None
+    audio_path: str | None
+    audio_transcript: str | None
+    audio_analysis: str | None
+    video_path: str | None
+    video_report: str | None
 
 
 def _build_classifier() -> Any:
@@ -152,6 +168,44 @@ def build_graph():
             "used_patient_context": True,
         }
 
+    def process_audio(state: AssistantState) -> AssistantState:
+        audio_path = state.get("audio_path")
+        if not audio_path:
+            return state
+
+        try:
+            transcript = transcribe(audio_path)
+            analysis = analyze_transcript(transcript)
+        except Exception as exc:
+            return {
+                **state,
+                "error": str(exc),
+                "answer": f"Unable to process audio input: {exc}",
+            }
+
+        return {
+            **state,
+            "audio_transcript": transcript,
+            "audio_analysis": analysis,
+        }
+
+    def process_video(state: AssistantState) -> AssistantState:
+        video_path = state.get("video_path")
+        if not video_path:
+            return state
+
+        try:
+            analysis = analyze_video(video_path, DEFAULT_YOLO_MODEL_PATH)
+            report = generate_video_report(analysis.detections)
+        except Exception as exc:
+            return {
+                **state,
+                "error": str(exc),
+                "answer": f"Unable to process video input: {exc}",
+            }
+
+        return {**state, "video_report": report}
+
     def generate_response(state: AssistantState) -> AssistantState:
         if state.get("error"):
             return state
@@ -159,6 +213,8 @@ def build_graph():
             question=state["query"],
             patient_context=state["patient_context"],
             kb_context=state["kb_context"],
+            audio_analysis=state.get("audio_analysis"),
+            video_report=state.get("video_report"),
         )
         try:
             answer = _generate_with_policy(prompt, local_generator, fallback_generator)
@@ -290,12 +346,24 @@ def build_graph():
     def route_after_patient_context(state: AssistantState) -> str:
         if state.get("error"):
             return "error_response"
+        return "process_audio"
+
+    def route_after_audio(state: AssistantState) -> str:
+        if state.get("error"):
+            return "error_response"
+        return "process_video"
+
+    def route_after_video(state: AssistantState) -> str:
+        if state.get("error"):
+            return "error_response"
         return "generate_response"
 
     graph = StateGraph(AssistantState)
     graph.add_node("classify_intent", classify_intent)
     graph.add_node("retrieve_kb_context", retrieve_kb_context)
     graph.add_node("retrieve_patient_context", retrieve_patient_context)
+    graph.add_node("process_audio", process_audio)
+    graph.add_node("process_video", process_video)
     graph.add_node("generate_response", generate_response)
     graph.add_node("validate_response", validate_response)
     graph.add_node("refuse_response", refuse_response)
@@ -305,6 +373,8 @@ def build_graph():
     graph.add_conditional_edges("classify_intent", route_after_classify)
     graph.add_edge("retrieve_kb_context", "retrieve_patient_context")
     graph.add_conditional_edges("retrieve_patient_context", route_after_patient_context)
+    graph.add_conditional_edges("process_audio", route_after_audio)
+    graph.add_conditional_edges("process_video", route_after_video)
     graph.add_edge("generate_response", "validate_response")
     graph.add_edge("validate_response", END)
     graph.add_edge("refuse_response", END)
