@@ -47,10 +47,10 @@
 
 ## M5 — Pipeline de vídeo
 
-- [ ] Criar `src/multimodal/video.py`
-  - [ ] Função `analyze_video(video_path, model_path)` — roda YOLOv8 frame a frame
-  - [ ] Função `generate_video_report(detections)` — retorna laudo textual estruturado com contagem de detecções, confidence médio e classificação de risco
-- [ ] Criar `scripts/analyze_video.py` — CLI standalone para testar o pipeline
+- [x] Criar `src/multimodal/video.py`
+  - [x] Função `analyze_video(video_path, model_path)` — roda YOLOv8 frame a frame
+  - [x] Função `generate_video_report(detections)` — retorna laudo textual estruturado com contagem de detecções, confidence médio e classificação de risco
+- [x] Criar `scripts/analyze_video.py` — CLI standalone para testar o pipeline
 
 ## M6 — Integração com LangGraph
 
