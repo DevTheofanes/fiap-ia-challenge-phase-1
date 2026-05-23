@@ -30,12 +30,12 @@
 
 ## M3 — Geração de dados sintéticos para YOLOv8
 
-- [ ] Criar `scripts/generate_synthetic_data.py`
-  - [ ] Gerar N frames base (fundo escuro simulando cavidade laparoscópica)
-  - [ ] Sobrepor manchas vermelhas em posições aleatórias (simulação de sangramento)
-  - [ ] Gerar labels YOLO (`.txt`) automaticamente com as coordenadas das manchas
-  - [ ] Gerar `dataset.yaml` com classes: `['anomalous_bleeding']`
-  - [ ] Salvar em `data/synthetic_bleeding/`
+- [x] Criar `scripts/generate_synthetic_data.py`
+  - [x] Gerar N frames base (fundo escuro simulando cavidade laparoscópica)
+  - [x] Sobrepor manchas vermelhas em posições aleatórias (simulação de sangramento)
+  - [x] Gerar labels YOLO (`.txt`) automaticamente com as coordenadas das manchas
+  - [x] Gerar `dataset.yaml` com classes: `['anomalous_bleeding']`
+  - [x] Salvar em `data/synthetic_bleeding/`
 
 ## M4 — Fine-tune YOLOv8
 
