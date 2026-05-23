@@ -39,11 +39,11 @@
 
 ## M4 — Fine-tune YOLOv8
 
-- [ ] Adicionar `ultralytics` ao `requirements.txt`
-- [ ] Criar `scripts/train_yolo.py`
-  - [ ] Fine-tune `yolov8n.pt` com os dados sintéticos (~20 épocas)
-  - [ ] Salvar modelo treinado em `artifacts/yolo/`
-  - [ ] Logar métricas: mAP50, precision, recall
+- [x] Adicionar `ultralytics` ao `requirements.txt`
+- [x] Criar `scripts/train_yolo.py`
+  - [x] Fine-tune `yolov8n.pt` com os dados sintéticos (~20 épocas)
+  - [x] Salvar modelo treinado em `artifacts/yolo/`
+  - [x] Logar métricas: mAP50, precision, recall
 
 ## M5 — Pipeline de vídeo
 
